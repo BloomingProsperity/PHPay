@@ -1,0 +1,1431 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><title>dipay</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<template id="legacy-ui-css" hidden>
+  :root { --page:#eaf5fd; --surface:#f4faff; --surface-blue:#f0f8ff; --field:#f9fcff; --line:#c5e0f4; --text:#18334f; --muted:#6f89a2; --sky:#68bff1; --accent:#f6bc78; --accent-hover:#efa95d; --danger:#d86b70; --ok:#398d67; --warn:#bd7b2c; --radius:16px; --txt:var(--text); --dim:var(--muted); }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 20px 56px; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--page); color:var(--text); }
+  .wrap { max-width:1240px; margin:0 auto; }
+  .app-header { display:flex; align-items:baseline; gap:12px; margin-bottom:20px; padding:4px 2px 18px; border-bottom:1px solid var(--line); }
+  .app-header h1 { margin:0; font-size:24px; letter-spacing:-.03em; } .app-header span { color:var(--muted); font-size:13px; }
+  .workspace { display:grid; grid-template-columns:minmax(0,1.62fr) minmax(330px,.92fr); gap:20px; align-items:start; }
+  .task-column,.side-column { min-width:0; } .side-column { display:grid; grid-template-rows:auto auto; gap:16px; align-self:start; }
+  .summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+  .count-card,.task-card,.resource-panel,.status-panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 8px 22px rgba(51,125,172,.06); } .resource-panel,.status-panel { width:100%; margin:0; box-sizing:border-box; }
+  .count-card { padding:13px 15px; color:var(--muted); font-size:12px; } .count-card strong { display:block; margin-top:4px; color:var(--text); font-size:25px; line-height:1; }
+  .task-card,.resource-panel,.status-panel { padding:18px; } .task-card h2,.resource-panel h2,.status-panel h2 { margin:0 0 14px; font-size:14px; }
+  label { display:block; margin:12px 0 6px; color:var(--muted); font-size:12px; font-weight:650; }
+  textarea,input,select { width:100%; color:var(--text); background:var(--field); border:1px solid var(--line); border-radius:10px; padding:9px 11px; font:13px system-ui,-apple-system,"Segoe UI",sans-serif; outline:none; transition:border-color .15s,box-shadow .15s; }
+  textarea { min-height:86px; resize:vertical; font-family:ui-monospace,SFMono-Regular,monospace; } textarea:focus,input:focus,select:focus,button:focus-visible,summary:focus-visible { border-color:var(--sky); outline:3px solid rgba(104,191,241,.28); outline-offset:2px; }
+  .row { display:flex; gap:10px; } .row > div { flex:1; min-width:0; } .hint { margin-top:6px; color:var(--muted); font-size:11px; line-height:1.5; } summary { cursor:pointer; color:var(--muted); }
+  .account-detect-row { display:flex; align-items:center; gap:9px; margin-top:8px; }
+  #account-detect-import { flex:none; min-height:32px; color:#123956; background:#dff2fd; border-color:#9ed3ee; }
+  #account-detect-result { min-width:0; color:var(--muted); font-size:11px; line-height:1.45; overflow-wrap:anywhere; }
+  #account-detect-result.ok { color:var(--ok); }
+  #account-detect-result.err { color:var(--danger); }
+  .execution-grid { display:grid; grid-template-columns:minmax(0,1fr) 116px; gap:10px; } .btns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:16px; }
+  button { min-height:38px; border:1px solid var(--line); border-radius:10px; padding:0 12px; color:var(--text); background:var(--field); font-size:13px; font-weight:650; cursor:pointer; transition:background .15s,border-color .15s,transform .06s; } button:active:not(:disabled) { transform:scale(.98); } button:disabled { opacity:.5; cursor:not-allowed; }
+  #pay,#link,#batch { color:#5c3a1b; background:var(--accent); border-color:var(--accent); } #pay:hover:not(:disabled),#link:hover:not(:disabled),#batch:hover:not(:disabled) { background:var(--accent-hover); border-color:var(--accent-hover); }
+  #batchpay { color:#a84951; border-color:#e9a9ad; background:#fff7f7; } #batchpay:hover:not(:disabled) { background:#ffecee; border-color:var(--danger); }
+  .payment-details { margin-top:16px; padding:0 13px 13px; border:1px solid var(--line); border-radius:12px; background:var(--surface-blue); } .payment-details summary { padding:12px 0; font-weight:700; color:var(--text); } .payment-details .row { margin-top:10px; }
+  .resource-panel { padding:8px 16px; } .resource-panel h2 { padding:10px 0 2px; margin-bottom:2px; }
+  .resource-section { padding:12px 0; border-top:1px solid var(--line); } .resource-section:first-of-type { border-top:0; }
+  .resource-row { display:flex; gap:10px; align-items:center; justify-content:space-between; } .resource-row h3 { margin:0; font-size:13px; } .resource-row p { margin:3px 0 0; color:var(--muted); font-size:11px; }
+  .resource-actions { display:flex; flex:none; gap:6px; } .resource-import,.resource-select { min-height:30px; padding:0 9px; font-size:12px; } .resource-import { background:var(--sky); border-color:var(--sky); color:#123956; } .resource-select { color:#2877a8; border-color:#a8d7ef; background:var(--field); }
+  .resource-body { display:grid; gap:9px; margin-top:12px; padding:12px; border:1px solid var(--line); border-radius:12px; background:var(--surface-blue); } .resource-body[hidden] { display:none; }
+  #solver-resource { padding-top:8px; }
+  .solver-summary { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:36px; }
+  .solver-status { display:flex; align-items:center; min-width:0; gap:8px; }
+  .solver-status::before { content:""; flex:none; width:8px; height:8px; border-radius:50%; background:#8fb5cc; box-shadow:0 0 0 4px rgba(143,181,204,.14); }
+  .solver-status:has(.ok)::before { background:var(--ok); box-shadow:0 0 0 4px rgba(57,141,103,.13); }
+  .solver-status:has(.err)::before { background:var(--danger); box-shadow:0 0 0 4px rgba(216,107,112,.13); }
+  .solver-settings { overflow:hidden; margin-top:10px; border-color:#acd7ef; background:#e5f3fd; box-shadow:inset 0 1px 0 rgba(255,255,255,.78); transform-origin:top; }
+  .solver-settings.is-opening { animation:solver-open .16s ease-out; }
+  .solver-settings.is-closing { animation:solver-close .13s ease-in forwards; }
+  .solver-actions { display:flex; align-items:center; flex-wrap:wrap; gap:7px; margin-top:4px; }
+  .solver-settings .hint { margin-top:0; opacity:.8; }
+  .solver-settings { grid-template-columns:minmax(0,1fr); align-items:start; margin:10px 0 4px; padding:0; border:0; background:transparent; box-shadow:none; }
+  .validation-card { display:flex; min-width:0; height:100%; flex-direction:column; padding:14px; border:1px solid #b7daef; border-radius:12px; background:#e6f4fd; }
+  .validation-card-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+  .validation-card-head h3 { margin:0; font-size:13px; }
+  .validation-card label { margin-top:8px; }
+  .field-inline { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px; align-items:center; }
+  .field-clear { width:30px; min-height:34px; padding:0; color:var(--danger); font-size:16px; font-weight:400; }
+  .text-action { min-height:26px; padding:0 6px; border:0; color:var(--danger); background:transparent; font-size:11px; }
+  .config-tools,.proxy-actions { display:flex; flex-wrap:wrap; gap:7px; }
+  .solver-actions,.proxy-actions { margin-top:9px; }
+  #solversave,#proxy-save { color:#5c3a1b; background:var(--accent); border-color:var(--accent); }
+  .proxy-editor { min-height:72px; }
+  .proxy-list,.three-ds-list { display:grid; gap:7px; }
+  .proxy-item,.three-ds-item { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:36px; padding:7px 9px; border:1px solid var(--line); border-radius:9px; background:var(--field); font-size:11px; }
+  .proxy-item code { min-width:0; overflow:hidden; color:var(--muted); text-overflow:ellipsis; white-space:nowrap; }
+  .three-ds-panel { padding:14px 16px; }
+  .three-ds-groups { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .three-ds-group { min-width:0; padding:10px; border:1px solid var(--line); border-radius:12px; background:var(--surface-blue); }
+  .three-ds-group h3 { margin:0 0 8px; font-size:12px; }
+  .three-ds-item { width:100%; justify-content:flex-start; border-color:transparent; text-align:left; }
+  .three-ds-item:hover { border-color:var(--line); background:#e3f3fd; }
+  .state-dot { width:8px; height:8px; flex:none; border-radius:50%; background:var(--warn); box-shadow:0 0 0 3px rgba(189,123,44,.12); }
+  .state-dot.done { background:var(--ok); box-shadow:0 0 0 3px rgba(57,141,103,.12); }
+  .state-tag { margin-left:auto; color:var(--muted); font-size:10px; }
+  .detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+  .detail-cell { padding:9px; border:1px solid var(--line); border-radius:9px; background:var(--surface-blue); font-size:11px; line-height:1.55; white-space:pre-line; }
+  .detail-cell strong { display:block; margin-bottom:2px; font-size:12px; }
+  .tag { display:inline-block; margin-left:5px; padding:1px 6px; border-radius:999px; color:#8d5a22; background:#fff0d9; font-size:10px; }
+  .config-tools a.btn-sm { display:inline-flex; align-items:center; justify-content:center; min-height:30px; padding:0 10px; border:1px solid var(--line); border-radius:10px; color:var(--text); background:var(--field); font-size:12px; font-weight:650; text-decoration:none; }
+  .service-meta { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:7px; }
+  .service-pill { display:inline-flex; align-items:center; min-height:22px; padding:0 8px; border:1px solid #b7daef; border-radius:999px; color:#377ca7; background:#f7fcff; font-size:10px; }
+  .service-pill.ok { color:var(--ok); border-color:#b8dfcf; background:#f3fbf7; }
+  .batch-health { margin-bottom:7px; color:#377ca7; font:11px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  .status-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .status-heading h2 { margin:0; }
+  .status-heading-tools { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:10px; }
+  @keyframes solver-open { from { opacity:0; max-height:0; padding-top:0; padding-bottom:0; transform:translateY(-4px); } to { opacity:1; max-height:360px; transform:translateY(0); } }
+  @keyframes solver-close { from { opacity:1; max-height:360px; } to { opacity:0; max-height:0; padding-top:0; padding-bottom:0; transform:translateY(-3px); } }
+  .task-resource-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0 2px; } .task-resource-summary span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:7px 9px; border:1px solid var(--line); border-radius:9px; color:#377ca7; background:var(--surface-blue); font-size:11px; } .drawer-file { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border:1px solid var(--line); border-radius:9px; background:var(--field); font-size:12px; } .drawer-file small { color:var(--muted); } .drawer-result { margin-top:8px; padding:9px 10px; border-radius:9px; background:var(--surface-blue); color:var(--muted); font-size:12px; line-height:1.55; } .batch-scope-hint { margin:9px 0 0; color:var(--muted); font-size:11px; line-height:1.5; }
+  .import-control { display:flex; align-items:center; gap:8px; } .import-control input[type=file] { flex:1; min-width:0; } .import-buttons { display:flex; align-items:center; gap:6px; } .btn-sm { min-height:30px; padding:0 10px; font-size:12px; } .btn-sm.danger { color:var(--danger); } .generator { display:grid; grid-template-columns:82px minmax(0,1fr) auto; gap:8px; align-items:center; }
+  .impstat { color:var(--muted); font-size:11px; } .impstat.ok,.ok { color:var(--ok); } .impstat.err,.err { color:var(--danger); } .warn { color:var(--warn); } .acclist { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:11px; line-height:1.6; }
+  .status-panel { display:grid; grid-template-columns:minmax(0,1fr); align-content:start; gap:12px; min-height:260px; margin-top:20px; } .status-panel h2 { margin-bottom:2px; } #bar,#log,#links { width:100%; margin:0; } #bar { height:6px; overflow:hidden; border-radius:999px; background:#ddecf8; } #fill { width:0%; height:100%; border-radius:inherit; background:var(--sky); transition:width .35s ease; } .status-content { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr); grid-auto-rows:minmax(170px,320px); align-items:stretch; gap:14px; min-width:0; } .status-log { display:grid; min-width:0; min-height:0; } .status-log > #log,.status-log > #links { grid-area:1 / 1; } #log { height:100%; min-height:0; max-height:none; overflow:auto; border:1px dashed #b8dced; border-radius:12px; padding:12px; color:var(--muted); background:var(--surface-blue); font:12px/1.75 ui-monospace,monospace; white-space:pre-wrap; } #log:empty::before { content:"运行日志会显示在这里"; color:#92adc1; } #log > div { animation:login .18s ease-out; } #links { z-index:1; align-self:end; width:auto; max-height:76px; margin:0 12px 12px; overflow:auto; border-radius:8px; background:rgba(229,243,253,.94); font:12px/1.8 ui-monospace,monospace; word-break:break-all; } #links:empty { display:none; } .status-log:has(#links:not(:empty)) #log { padding-bottom:92px; } .success-pane { display:flex; flex-direction:column; min-width:0; height:100%; overflow:hidden; border:1px solid var(--line); border-radius:12px; padding:12px; background:var(--surface-blue); } .success-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:9px; } .success-heading h3 { margin:5px 0 0; font-size:13px; } .success-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; } #success-list { display:grid; flex:1; min-height:0; gap:7px; max-height:270px; overflow:auto; } .success-item { padding:8px 9px; border:1px solid var(--line); border-radius:9px; background:var(--field); font-size:11px; line-height:1.55; } .success-item strong { display:block; font-size:12px; } .success-empty { color:var(--muted); font-size:11px; } a { color:#2877a8; }
+  .modal-mask { position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center; background:rgba(24,51,79,.38); backdrop-filter:blur(3px); } .modal-mask.show { display:flex; animation:modal-fade .16s ease-out; } .modal-mask.show .modal { animation:modal-rise .2s cubic-bezier(.2,.8,.2,1); } .modal { width:min(560px,92vw); max-height:72vh; overflow:auto; padding:18px; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:0 16px 48px rgba(24,51,79,.25); } .modal-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; } .modal h3 { margin:0; font-size:14px; } #modal-close { flex:none; width:30px; min-height:30px; padding:0; border-radius:50%; color:var(--muted); font-size:19px; font-weight:400; line-height:1; } #modal-close:hover { color:var(--text); background:var(--surface-blue); } .modal .item { padding:8px 10px; border-radius:8px; cursor:pointer; font:12px/1.5 ui-monospace,monospace; } .modal .item:hover { background:var(--surface-blue); }
+  @keyframes modal-fade { from { opacity:0; } to { opacity:1; } }
+  @keyframes modal-rise { from { opacity:0; transform:translateY(10px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+  input[type=file] { padding:6px; font-size:11px; } input[type=file]::file-selector-button { margin-right:8px; padding:4px 8px; border:1px solid var(--line); border-radius:6px; color:var(--text); background:var(--field); cursor:pointer; }
+  .plan-picker { position:relative; } .plan-native-select { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0; }
+  .plan-picker-trigger { display:flex; align-items:center; justify-content:space-between; width:100%; text-align:left; background:var(--field); } .plan-picker-trigger::after { content:"⌄"; margin-left:10px; color:#438db8; font-size:16px; line-height:1; transition:transform .18s ease; } .plan-picker-trigger[aria-expanded="true"]::after { transform:rotate(180deg); }
+  .plan-picker-menu { position:absolute; z-index:20; top:calc(100% + 7px); left:0; width:100%; padding:6px; border:1px solid #b8ddec; border-radius:12px; background:#f1f9ff; box-shadow:0 12px 28px rgba(40,109,151,.16); opacity:0; pointer-events:none; transform:translateY(-5px) scale(.985); transition:opacity .18s ease,transform .18s ease; } .plan-picker-menu.is-open { opacity:1; pointer-events:auto; transform:translateY(0) scale(1); }
+  .plan-picker-option { position:relative; display:flex; align-items:center; width:100%; min-height:35px; padding:0 9px 0 24px; border:0; border-radius:8px; color:var(--text); background:transparent; font-weight:600; text-align:left; } .plan-picker-option:hover,.plan-picker-option:focus-visible { background:#dff2fd; border-color:transparent; outline:0; } .plan-picker-option.is-selected::before { content:""; position:absolute; left:10px; width:7px; height:7px; border-radius:50%; background:#4faee2; box-shadow:0 0 0 3px rgba(79,174,226,.16); }
+  @media (max-width:1100px) { body { padding:20px 14px 40px; } .workspace { grid-template-columns:1fr; } .task-column { display:block; } .task-column > .task-card,.side-column > .resource-panel:last-child { height:auto; } .side-column { grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:auto auto; align-items:start; align-self:auto; } .three-ds-panel { grid-column:1 / -1; } .status-content { grid-template-columns:minmax(0,1.35fr) minmax(280px,.9fr); } .status-log,.success-pane { min-height:190px; } }
+  @media (max-width:720px) { .side-column,.status-content { grid-template-columns:1fr; } .three-ds-panel { grid-column:auto; } .status-content { grid-auto-rows:auto; } }
+  @media (max-width:560px) { .summary-grid { gap:8px; } .count-card { padding:11px; } .execution-grid,.generator,.task-resource-summary,.three-ds-groups,.detail-grid,.solver-settings { grid-template-columns:1fr; } .btns { grid-template-columns:1fr; } .resource-row { align-items:flex-start; } .resource-actions { flex-wrap:wrap; justify-content:flex-end; } .import-control { align-items:stretch; flex-direction:column; } .solver-summary { align-items:flex-start; flex-wrap:wrap; } .solver-actions { align-items:stretch; } }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
+</template><link rel="stylesheet" href="/reference-ui.css"></head><body>
+<div class="wrap">
+  <header class="app-header">
+    <div class="brand"><span class="brand-mark">d</span><h1>dipay</h1><span>ChatGPT 订阅支付</span></div>
+    <div class="header-status"><span class="online-pill">服务在线</span><span class="local-pill">本地运行</span></div>
+  </header>
+
+  <main class="reference-layout">
+    <section class="panel resource-overview" aria-labelledby="resource-title">
+      <div class="section-heading"><span></span><h2 id="resource-title">资源库</h2><small>严格文件导入 · 错误行不入库</small></div>
+      <div class="resource-grid">
+        <section class="resource-card" id="account-resource">
+          <div class="resource-metric"><span>账号库</span><div><strong id="account-count">0</strong><small>个</small></div></div>
+          <div class="resource-actions"><button class="resource-import primary" type="button">导入</button><button class="resource-select" type="button">查看</button></div>
+        </section>
+        <section class="resource-card" id="card-resource">
+          <div class="resource-metric"><span>卡库</span><div><strong id="card-count">0</strong><small>张</small></div></div>
+          <div class="resource-actions"><button class="resource-import primary" type="button">导入</button><button class="resource-select" type="button">查看</button></div>
+        </section>
+        <section class="resource-card" id="address-resource">
+          <div class="resource-metric"><span>地址库</span><div><strong id="address-count">0</strong><small>条</small></div></div>
+          <div class="resource-actions"><button class="resource-import primary" type="button">导入</button><button class="resource-select" type="button">查看</button></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="panel task-card" aria-labelledby="task-title">
+      <div class="section-heading"><span></span><h2 id="task-title">支付任务</h2><small>单笔任务 · 资源可明确指定</small></div>
+      <div class="payment-grid">
+        <div class="session-column">
+          <label for="sess">账号 session</label>
+          <textarea id="sess" rows="5" placeholder="粘贴账号信息，自动识别三种格式"></textarea>
+          <div class="hint">支持：session JSON · accessToken · sessionToken（自动识别兑换）</div>
+          <div class="account-detect-row">
+            <button id="account-detect-import" type="button">检测并入库</button>
+            <span id="account-detect-result" role="status" aria-live="polite">粘贴后点击检测，成功会自动加入账号库</span>
+          </div>
+          <details class="account-help"><summary>› 如何获取这三种账号信息？</summary><div>登录 chatgpt.com 后可复制 session JSON、accessToken 或 sessionToken；系统会自动识别需要的账号信息。</div></details>
+        </div>
+        <div class="execution-column">
+          <div class="execution-grid">
+            <div><label id="plan-picker-label" for="plan-picker-trigger">套餐</label><div class="plan-picker"><select id="plan" class="plan-native-select" tabindex="-1" aria-hidden="true"><option value="chatgptpro">Pro 20x（₱9,990）</option><option value="chatgptprolite">Pro 5x（₱6,490）</option><option value="chatgptplusplan">Plus（₱1,100）</option><option value="chatgptgoplan">Go（₱300）</option><option value="chatgptteamplan">Team（₱1,450/席）</option></select><button id="plan-picker-trigger" class="plan-picker-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="plan-picker-label" aria-controls="plan-picker-menu">Pro 20x（₱9,990）</button><div id="plan-picker-menu" class="plan-picker-menu" role="listbox" aria-label="套餐选项" hidden><button class="plan-picker-option is-selected" type="button" role="option" aria-selected="true" data-plan="chatgptpro">Pro 20x（₱9,990）</button><button class="plan-picker-option" type="button" role="option" aria-selected="false" data-plan="chatgptprolite">Pro 5x（₱6,490）</button><button class="plan-picker-option" type="button" role="option" aria-selected="false" data-plan="chatgptplusplan">Plus（₱1,100）</button><button class="plan-picker-option" type="button" role="option" aria-selected="false" data-plan="chatgptgoplan">Go（₱300）</button><button class="plan-picker-option" type="button" role="option" aria-selected="false" data-plan="chatgptteamplan">Team（₱1,450/席）</button></div></div></div>
+            <div><label for="conc">并发</label><input id="conc" type="number" min="1" max="10" value="1"></div>
+          </div>
+          <details id="payment-details" class="payment-details">
+            <summary><span>›</span> 手动填写支付卡与账单地址 <small>备用</small></summary>
+            <div class="manual-grid">
+              <div class="span-3"><label for="num">卡号</label><input id="num" placeholder="4242 4242 4242 4242"></div>
+              <div><label for="exp">有效期</label><input id="exp" placeholder="MM/YY" inputmode="numeric" autocomplete="cc-exp" maxlength="5"></div>
+              <div><label for="cvc">CVC</label><input id="cvc" placeholder="CVC"></div>
+              <div><label for="name">持卡人</label><input id="name" placeholder="持卡人（可选）"></div>
+              <div class="span-3"><label for="line1">地址</label><input id="line1" placeholder="地址"></div>
+              <div><label for="city">城市</label><input id="city" placeholder="城市"></div>
+              <div><label for="state">州/省</label><input id="state" placeholder="州/省"></div>
+              <div><label for="zip">邮编</label><input id="zip" placeholder="邮编"></div>
+              <div class="span-3"><label for="country">国家</label><input id="country" placeholder="国家"></div>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="btns"><button id="pay">立即支付</button><button id="link">仅生成链接</button><button id="batch">批量生成链接</button><button id="batchpay">批量支付</button></div>
+    </section>
+
+    <section class="panel services-panel" aria-labelledby="services-title">
+      <div class="section-heading"><span></span><h2 id="services-title">服务与验证</h2><small>代理与验证配置按本地部署独立保存</small></div>
+      <div class="services-grid">
+        <section class="service-card" id="solver-resource">
+          <div class="service-head"><h3>验证配置</h3><button class="text-action" id="solver-clear-all" type="button">清空</button></div>
+          <div id="solver-settings">
+            <label for="solver-key">备用验证密钥</label><div class="field-inline"><input id="solver-key" type="password" placeholder="CAP-xxxxxxxx" autocomplete="off"><button class="field-clear" id="solver-clear-key" type="button" aria-label="清除 Key">×</button></div>
+            <label for="solver-ws">连接现有浏览器</label><div class="field-inline"><input id="solver-ws" placeholder="ws://127.0.0.1:9222（可选）"><button class="field-clear" id="solver-clear-ws" type="button" aria-label="清除浏览器地址">×</button></div>
+            <div class="service-actions"><button class="btn-sm primary" id="solversave">保存</button><button class="btn-sm" id="solvertest">测试</button><button class="btn-sm" id="solverimport">导入</button><input id="solver-file" type="file" accept=".json,.txt" hidden></div>
+          </div>
+          <div class="solver-status" id="solver-status" role="status" aria-live="polite"><span class="impstat" id="solverstat">正在读取状态…</span></div>
+        </section>
+        <section class="service-card proxy-card">
+          <div class="service-head"><h3>网络代理</h3><span class="impstat" id="proxy-stat"></span></div>
+          <label for="proxy-editor">代理列表</label><textarea id="proxy-editor" class="proxy-editor" placeholder="127.0.0.1:8080&#10;host:port:user:pass"></textarea>
+          <div class="service-actions"><button class="btn-sm primary" id="proxy-save">保存</button><button class="btn-sm" id="proxy-import">导入</button><button class="btn-sm" id="proxy-manage">查看</button><button class="btn-sm danger" id="proxy-clear">清空</button><input id="proxy-file" type="file" accept=".txt,.csv" hidden></div>
+          <div class="proxy-list" id="proxy-list" hidden></div>
+          <p>按列表从上到下轮询；未配置时直接使用当前网络。</p>
+        </section>
+        <section class="service-card three-ds-panel" aria-labelledby="three-ds-title">
+          <div class="service-head"><h3 id="three-ds-title">3DS 手动验证</h3></div>
+          <p>点击数量查看账号列表与验证信息；系统按账号等级变化确认完成。</p>
+          <div class="three-ds-groups">
+            <section class="three-ds-group"><div id="three-ds-pending" class="three-ds-summary"><span>待验证</span><strong id="three-ds-pending-count">0</strong><button id="three-ds-pending-view" class="btn-sm three-ds-view" type="button">查看账号</button></div></section>
+            <section class="three-ds-group"><div id="three-ds-completed" class="three-ds-summary"><span>最近完成</span><strong id="three-ds-completed-count">0</strong><button id="three-ds-completed-view" class="btn-sm three-ds-view" type="button">查看账号</button></div></section>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="panel status-panel" aria-labelledby="status-title">
+      <div class="status-heading"><div class="section-heading"><span></span><h2 id="status-title">任务状态</h2></div><div class="status-heading-tools"><span>新任务自动刷新</span><button id="log-clear" class="btn-sm" type="button">清空当前日志</button></div></div>
+      <div class="progress-row"><div id="bar"><div id="fill"></div></div><span id="progress-value">0%</span></div>
+      <div class="status-content">
+        <div class="status-log"><div id="log" aria-live="polite"></div><div id="links"></div></div>
+        <section class="success-pane" aria-labelledby="success-title"><div class="success-heading"><h3 id="success-title">支付成功</h3><div class="success-actions"><button id="success-refresh" class="btn-sm" type="button">刷新</button><button id="success-clear" class="btn-sm danger" type="button">清成功</button><button id="failed-clear" class="btn-sm danger" type="button">清失败</button><button id="terminal-clear" class="btn-sm danger" type="button">清终态</button></div></div><div id="success-list"><span class="success-empty">暂无确认成功的支付</span></div></section>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-mask" id="modal-mask">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-heading"><h3 id="modal-title"></h3><button id="modal-close" type="button" aria-label="关闭弹窗" title="关闭">×</button></div>
+    <div id="modal-items"></div>
+  </div>
+</div>
+
+<script>
+const fill = document.getElementById('fill'), log = document.getElementById('log'), links = document.getElementById('links');
+const btns = [pay, link, batch, batchpay];
+const progressValue = document.getElementById('progress-value');
+new MutationObserver(() => {
+  progressValue.textContent = fill.style.width || '0%';
+}).observe(fill, { attributes:true, attributeFilter:['style'] });
+exp.addEventListener('input', () => {
+  const digits = exp.value.replace(/\D/g, '').slice(0, 4);
+  exp.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+});
+const planPickerTrigger = document.getElementById('plan-picker-trigger');
+const planPickerMenu = document.getElementById('plan-picker-menu');
+const planSelect = document.getElementById('plan');
+const planPickerOptions = () => [...planPickerMenu.querySelectorAll('[data-plan]')];
+const closePlanPicker = (returnFocus = false) => {
+  planPickerMenu.classList.remove('is-open');
+  planPickerMenu.hidden = true;
+  planPickerTrigger.setAttribute('aria-expanded', 'false');
+  if (returnFocus) planPickerTrigger.focus();
+};
+const syncPlanPicker = () => {
+  const selected = planSelect.options[planSelect.selectedIndex];
+  planPickerTrigger.textContent = selected.text;
+  planPickerOptions().forEach(option => {
+    const isSelected = option.dataset.plan === planSelect.value;
+    option.classList.toggle('is-selected', isSelected);
+    option.setAttribute('aria-selected', String(isSelected));
+    option.tabIndex = -1;
+  });
+};
+const focusPlanPickerOption = index => {
+  const options = planPickerOptions();
+  options[Math.max(0, Math.min(index, options.length - 1))]?.focus();
+};
+const openPlanPicker = (focusIndex) => {
+  planPickerMenu.hidden = false;
+  planPickerMenu.offsetWidth;
+  planPickerMenu.classList.add('is-open');
+  planPickerTrigger.setAttribute('aria-expanded', 'true');
+  const selectedIndex = planPickerOptions().findIndex(option => option.dataset.plan === planSelect.value);
+  focusPlanPickerOption(Number.isInteger(focusIndex) ? focusIndex : selectedIndex);
+};
+const choosePlanPickerOption = option => {
+  planSelect.value = option.dataset.plan;
+  planSelect.dispatchEvent(new Event('change', { bubbles:true }));
+  closePlanPicker(true);
+};
+planPickerTrigger.addEventListener('click', () => planPickerMenu.classList.contains('is-open') ? closePlanPicker() : openPlanPicker());
+planPickerTrigger.addEventListener('keydown', event => {
+  if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+  event.preventDefault();
+  openPlanPicker(event.key === 'ArrowDown' ? 0 : planPickerOptions().length - 1);
+});
+planPickerMenu.addEventListener('click', event => {
+  const option = event.target.closest('[data-plan]');
+  if (!option) return;
+  choosePlanPickerOption(option);
+});
+planPickerMenu.addEventListener('keydown', event => {
+  const options = planPickerOptions();
+  const index = options.indexOf(document.activeElement);
+  if (index < 0) return;
+  if (event.key === 'ArrowDown') { event.preventDefault(); focusPlanPickerOption(index + 1); }
+  else if (event.key === 'ArrowUp') { event.preventDefault(); focusPlanPickerOption(index - 1); }
+  else if (event.key === 'Home') { event.preventDefault(); focusPlanPickerOption(0); }
+  else if (event.key === 'End') { event.preventDefault(); focusPlanPickerOption(options.length - 1); }
+  else if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choosePlanPickerOption(options[index]); }
+  else if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); closePlanPicker(true); }
+});
+planSelect.addEventListener('change', syncPlanPicker);
+document.addEventListener('click', event => {
+  if (!event.target.closest('.plan-picker')) closePlanPicker();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !planPickerMenu.hidden) closePlanPicker(true);
+});
+syncPlanPicker();
+
+function closeModal() { document.getElementById('modal-mask').classList.remove('show'); }
+document.getElementById('modal-close').onclick = closeModal;
+document.getElementById('modal-mask').onclick = e => { if (e.target.id === 'modal-mask') closeModal(); };
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && document.getElementById('modal-mask').classList.contains('show')) closeModal(); });
+
+// 纯展示弹窗（警告、失败明细等，不可点击）
+function openInfo(title, lines) {
+  const mask = document.getElementById('modal-mask');
+  document.getElementById('modal-title').textContent = title;
+  const box = document.getElementById('modal-items');
+  box.innerHTML = '';
+  lines.forEach(t => {
+    const d = document.createElement('div');
+    d.className = 'item';
+    d.style.cursor = 'default';
+    d.textContent = t;
+    box.appendChild(d);
+  });
+  mask.classList.add('show');
+}
+
+const resourceLibraries = {
+  acclist: { list: [], name: '账号库', unit: '个' },
+  cardlist: { list: [], name: '卡库', unit: '张' },
+  addrlist: { list: [], name: '地址库', unit: '条' }
+};
+
+fetch('/api/defaults').then(r => r.json()).then(d => {
+  if (d.card) { num.value = d.card.number || ''; exp.value = d.card.exp || ''; cvc.value = d.card.cvc || ''; document.getElementById("name").value = d.card.name || ''; }
+  if (d.address) { line1.value = d.address.line1 || ''; city.value = d.address.city || ''; state.value = d.address.state || ''; zip.value = d.address.zip || ''; country.value = d.address.country || ''; }
+}).catch(() => {});
+
+function getSess() {
+  const v = document.getElementById('sess').value.trim();
+  if (!v) { log.textContent = '请先粘贴账号信息'; return null; }
+  return v;
+}
+function run(url, payload) {
+  btns.forEach(b => b.disabled = true);
+  fill.style.width = '0%'; log.textContent = ''; links.textContent = '';
+  const es = new EventSource(url + encodeURIComponent(JSON.stringify(payload)));
+  es.onmessage = ev => {
+    const d = JSON.parse(ev.data);
+    fill.style.width = d.pct + '%';
+    const row = document.createElement('div');
+    row.className = d.cls || '';
+    row.textContent = `[${new Date().toLocaleTimeString()}] ${d.msg}`;
+    log.append(row);
+    log.scrollTop = log.scrollHeight;
+    if (d.links) {
+      const L = d.links;
+      links.replaceChildren();
+      for (const [label, value] of [['结账链接', L.short], ['托管链接', L.hosted], ['GCash', L.gcash]]) {
+        if (!safeExternalUrl(value)) continue;
+        const line = document.createElement('div');
+        const anchor = document.createElement('a');
+        anchor.href = value; anchor.target = '_blank'; anchor.rel = 'noopener noreferrer';
+        anchor.textContent = value.slice(0, 100);
+        line.append(`${label}: `, anchor);
+        links.append(line);
+      }
+    }
+    if (d.done) { es.close(); btns.forEach(b => b.disabled = false); }
+  };
+  es.onerror = () => { es.close(); btns.forEach(b => b.disabled = false); };
+}
+function safeExternalUrl(value) {
+  try { return new URL(String(value)).protocol === 'https:'; } catch { return false; }
+}
+let currentPaymentTask = null;
+let paymentTaskTimer = null;
+let batchPaymentTaskTimer = null;
+const terminalPaymentStates = new Set(['succeeded', 'failed']);
+
+function setPaymentButtonsDisabled(disabled) {
+  btns.forEach(button => { button.disabled = disabled; });
+}
+
+document.getElementById('log-clear').onclick = () => {
+  fill.style.width = '0%';
+  log.replaceChildren();
+  links.replaceChildren();
+};
+
+function paymentTaskReason(code) {
+  if (code === 'cloudflare_challenge_failed') return '安全验证暂时未通过，付款未执行，请稍后重试。';
+  if (code === 'account_already_subscribed') return '该账号已有有效订阅，付款已停止。';
+  if (code === 'account_already_on_target_plan') return '该账号已经订阅所选目标套餐，付款已停止。';
+  if (code === 'unsupported_target_plan') return '所选套餐不受支持，付款已停止。';
+  if (code === 'account_status_check_failed') return '暂时无法确认账号订阅状态，付款未执行。';
+  if (code === 'account_completion_failed') return '3DS 已完成，但账号资源收尾暂时失败，服务将自动重试。';
+  if (code === 'observer_internal_error') return '3DS 状态观察暂时异常，服务将自动重试。';
+  if (code === 'account_resource_not_found') return '找不到该支付任务关联的账号资源，无法继续自动确认。';
+  if (code === 'actual_amount_unavailable') return '无法确认平台实际应付金额，付款未执行。';
+  if (code === 'promotional_offer_attached') return '支付会话带有优惠或试用标记，付款未执行。';
+  if (code === 'payment_result_unknown') return '支付结果暂未确认，请勿重复付款，并在账号或收银台中核实。';
+  if (code === 'zero_amount_offer') return '平台实际应付为 0.00；命中优惠，未执行付款。';
+  if (code === 'invalid_card_data') return '支付卡信息未通过校验。';
+  if (code === 'invalid_account_credential') return '账号凭证无效或已失效。';
+  if (code === 'resource_in_use') return '所选账号、卡或地址正在被另一笔支付任务使用。';
+  if (code === 'proxy_in_use') return '可用代理正在被其他任务占用，请稍后再试。';
+  if (code === 'proxy_unavailable' || code === 'proxy_connection_failed') return '代理预检未通过；任务未进入付款确认。';
+  if (['incorrect_address', 'invalid_address', 'incorrect_zip', 'invalid_postal_code'].includes(code)) return '账单地址未通过支付平台校验。';
+  if (['card_declined', 'expired_card', 'incorrect_cvc', 'invalid_cvc', 'incorrect_number', 'invalid_number', 'processing_error'].includes(code)) return '支付卡被明确拒绝；批量任务会按顺序尝试下一张卡。';
+  if (code === 'insufficient_funds') return '支付卡余额不足，已暂停该卡。';
+  if (code === 'payment_execution_failed') return '支付执行失败，请查看本地服务日志。';
+  return '';
+}
+
+function renderPaymentTask(task) {
+  currentPaymentTask = task;
+  const progress = { processing: 48, pending_3ds: 72, completing_3ds: 88, succeeded: 100, failed: 100, unknown: 86 };
+  fill.style.width = `${progress[task.state] || 0}%`;
+  const amount = Number.isInteger(task.amount) ? `\n应付金额：${(task.amount / 100).toFixed(2)} ${task.currency || ''}` : '';
+  const reason = paymentTaskReason(task.errorCode);
+  const stage = task.stage ? `\n阶段：${task.stage}` : '';
+  log.textContent = `任务 ${task.id.slice(0, 8)}\n账号：${task.email || '识别中'}\n卡：•••• ${task.cardLast4 || '----'}\n状态：${task.state}${stage}${amount}${reason ? `\n原因：${reason}` : ''}`;
+  links.replaceChildren();
+  if (task.state === 'pending_3ds' || task.state === 'completing_3ds' || task.state === 'unknown') {
+    const hint = document.createElement('div');
+    hint.className = 'warn';
+    hint.textContent = task.state === 'pending_3ds' || task.state === 'completing_3ds'
+      ? '需要手动完成 3DS；系统将按账号等级变化自动确认。'
+      : '支付结果尚未确认，请勿重新付款；请先重新查询。';
+    links.append(hint);
+    if (task.state === 'pending_3ds' && task.verificationUrl) {
+      const verify = document.createElement('a');
+      verify.href = task.verificationUrl; verify.target = '_blank'; verify.rel = 'noopener noreferrer';
+      verify.textContent = '完成银行验证';
+      links.append(verify);
+    }
+    if (task.state === 'unknown') {
+      const recheck = document.createElement('button');
+      recheck.type = 'button'; recheck.className = 'btn-sm'; recheck.textContent = '重新查询';
+      recheck.onclick = () => recheckPaymentTask(task);
+      links.append(recheck);
+    }
+  }
+}
+
+function schedulePaymentTaskPoll(task, options = {}) {
+  if (paymentTaskTimer) { clearTimeout(paymentTaskTimer); paymentTaskTimer = null; }
+  if (task.state !== 'processing') {
+    if (terminalPaymentStates.has(task.state)) {
+      window.dispatchEvent(new Event('dipay-payment-finished'));
+      const action = String(task.retryAction || 'stop');
+      if (task.state === 'failed' && ['next_card', 'next_address', 'next_proxy'].includes(action) && options.onFailureAction) {
+        void options.onFailureAction(action, task);
+      } else {
+        setPaymentButtonsDisabled(false);
+      }
+    } else if (task.state === 'unknown' || task.state === 'pending_3ds' || task.state === 'completing_3ds') {
+      setPaymentButtonsDisabled(false);
+      window.dispatchEvent(new Event('dipay-payment-progress'));
+    }
+    return;
+  }
+  paymentTaskTimer = setTimeout(async () => {
+    try {
+      const response = await fetch(`/api/payment-tasks/${task.id}`);
+      if (!response.ok) throw new Error('任务查询失败');
+      const updated = await response.json();
+      renderPaymentTask(updated);
+      schedulePaymentTaskPoll(updated, options);
+    } catch (error) {
+      log.textContent = `任务查询失败：${error.message}`;
+      setPaymentButtonsDisabled(false);
+    }
+  }, 1000);
+}
+
+async function submitPaymentTask(payload, options = {}) {
+  const idempotencyKey = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
+  setPaymentButtonsDisabled(true);
+  fill.style.width = '8%'; log.textContent = '正在创建支付任务…'; links.replaceChildren();
+  try {
+    const response = await fetch('/api/payment-tasks', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey }, body: JSON.stringify(payload) });
+    const task = await response.json();
+    if (!response.ok) throw new Error(task.error || '任务创建失败');
+    renderPaymentTask(task);
+    schedulePaymentTaskPoll(task, options);
+  } catch (error) {
+    log.textContent = `支付任务创建失败：${error.message}`;
+    setPaymentButtonsDisabled(false);
+  }
+}
+
+const paymentPlanNames = {
+  chatgptpro: 'Pro 20x',
+  chatgptprolite: 'Pro 5x',
+  chatgptplusplan: 'Plus',
+  chatgptgoplan: 'Go',
+  chatgptteamplan: 'Team'
+};
+
+async function refreshPaymentSuccesses() {
+  const listElement = document.getElementById('success-list');
+  try {
+    const response = await fetch('/api/payment-tasks?state=succeeded&limit=100');
+    if (!response.ok) throw new Error('成功记录查询失败');
+    const tasks = await response.json();
+    listElement.replaceChildren();
+    if (!tasks.length) {
+      const empty = document.createElement('span'); empty.className = 'success-empty'; empty.textContent = '暂无确认成功的支付'; listElement.append(empty);
+      return;
+    }
+    for (const task of tasks) {
+      const item = document.createElement('div'); item.className = 'success-item';
+      const title = document.createElement('strong'); title.textContent = task.email || '未识别账号';
+      const amount = Number.isInteger(task.amount) ? `${(task.amount / 100).toFixed(2)} ${task.currency || ''}` : '金额未知';
+      const time = task.updatedAt ? new Date(task.updatedAt).toLocaleString() : '';
+      item.append(title, document.createTextNode(`${paymentPlanNames[task.plan] || task.plan || '套餐未知'} · ${amount} · •••• ${task.cardLast4 || '----'}${time ? ` · ${time}` : ''}`));
+      listElement.append(item);
+    }
+  } catch (error) {
+    listElement.textContent = `加载失败：${error.message}`;
+  }
+}
+
+document.getElementById('success-refresh').onclick = refreshPaymentSuccesses;
+document.getElementById('success-clear').onclick = async () => {
+  if (!confirm('只清除支付成功记录？账号库、卡库和地址库不会被删除。')) return;
+  await fetch('/api/payment-tasks/succeeded', { method: 'DELETE' });
+  await refreshPaymentSuccesses();
+};
+document.getElementById('failed-clear').onclick = async () => {
+  if (!confirm('清除失败任务记录？资源库及使用统计不会被删除。')) return;
+  await fetch('/api/payment-tasks/terminal?state=failed', { method: 'DELETE' });
+};
+document.getElementById('terminal-clear').onclick = async () => {
+  if (!confirm('清除成功和失败任务记录？处理中、待 3DS 和未知状态不会删除。')) return;
+  await fetch('/api/payment-tasks/terminal?state=all', { method: 'DELETE' });
+  await refreshPaymentSuccesses();
+};
+window.addEventListener('dipay-payment-finished', refreshPaymentSuccesses);
+refreshPaymentSuccesses();
+
+function renderBatchPaymentTasks(batch) {
+  const tasks = batch.tasks || [];
+  const total = batch.total || tasks.length;
+  const counts = tasks.reduce((all, task) => ({ ...all, [task.state]: (all[task.state] || 0) + 1 }), {});
+  const settled = (counts.succeeded || 0) + (counts.failed || 0);
+  const proxy = batch.proxy || {};
+  const waiting = batch.waiting || {};
+  const proxyLine = proxy.direct
+    ? '网络：当前出口直连'
+    : `代理：健康 ${proxy.healthy || 0}/${proxy.total || 0} · 占用 ${proxy.inUse || 0} · 不可用 ${proxy.unavailable || 0} · 待检 ${proxy.unchecked || 0}`;
+  const waits = [
+    waiting.proxy ? `等代理 ${waiting.proxy}` : '',
+    waiting.card ? `等卡释放 ${waiting.card}` : '',
+    waiting.cooldown ? `等卡冷却 ${waiting.cooldown}` : ''
+  ].filter(Boolean).join(' · ');
+  fill.style.width = `${total ? Math.round(settled / total * 100) : 0}%`;
+  log.textContent = `批量任务 ${total} 笔\n${proxyLine}${waits ? ` · ${waits}` : ''}\n已创建：${tasks.length} · 排队中：${batch.queued || 0} · 处理中：${counts.processing || 0} · 成功：${counts.succeeded || 0} · 失败：${counts.failed || 0} · 待 3DS：${(counts.pending_3ds || 0) + (counts.completing_3ds || 0)} · 未知：${counts.unknown || 0}${batch.pausedCards ? ` · 已暂停卡位：${batch.pausedCards}` : ''}\n\n${tasks.map(task => `${task.email || '未识别账号'} · •••• ${task.cardLast4 || '----'} · ${task.state}${Number.isInteger(task.amount) ? ` · ${(task.amount / 100).toFixed(2)} ${task.currency || ''}` : ''}`).join('\n')}`;
+  links.replaceChildren();
+  for (const task of tasks.filter(task => ['pending_3ds', 'completing_3ds'].includes(task.state) && task.verificationUrl)) {
+    const verify = document.createElement('a');
+    verify.href = task.verificationUrl; verify.target = '_blank'; verify.rel = 'noopener noreferrer';
+    verify.textContent = `${task.email || task.id.slice(0, 8)}：完成银行验证`;
+    links.append(verify);
+  }
+}
+
+function scheduleBatchPaymentPoll(batchId) {
+  if (batchPaymentTaskTimer) { clearTimeout(batchPaymentTaskTimer); batchPaymentTaskTimer = null; }
+  batchPaymentTaskTimer = setTimeout(async () => {
+    try {
+      const response = await fetch(`/api/payment-batches/${batchId}`);
+      if (!response.ok) throw new Error('batch task lookup failed');
+      const batch = await response.json();
+      renderBatchPaymentTasks(batch);
+      window.dispatchEvent(new Event('dipay-payment-progress'));
+      if (batch.state === 'processing' || batch.state === 'paused') {
+        scheduleBatchPaymentPoll(batchId);
+      } else {
+        setPaymentButtonsDisabled(false);
+        window.dispatchEvent(new Event('dipay-payment-finished'));
+      }
+    } catch (error) {
+      log.textContent = `批量支付状态查询失败：${error.message}`;
+      setPaymentButtonsDisabled(false);
+    }
+  }, 1000);
+}
+
+async function submitBatchPayment() {
+  if (!confirm('批量支付会轮询复用可用卡；每张卡在任务期间锁定，任务结束后冷却 30 秒。地址库为空时自动生成本次临时地址。确定继续？')) return;
+  setPaymentButtonsDisabled(true);
+  fill.style.width = '8%'; log.textContent = '正在创建受保护的批量支付任务…'; links.replaceChildren();
+  try {
+    const response = await fetch('/api/payment-tasks/batch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan: plan.value, concurrency: conc.value || 1 }) });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || '批量任务创建失败');
+    renderBatchPaymentTasks(data);
+    scheduleBatchPaymentPoll(data.id);
+  } catch (error) {
+    log.textContent = `批量任务创建失败：${error.message}`;
+    setPaymentButtonsDisabled(false);
+  }
+}
+
+async function recheckPaymentTask(task) {
+  const sessionJson = getSess();
+  if (!sessionJson) return;
+  try {
+    const response = await fetch(`/api/payment-tasks/${task.id}/recheck`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionJson }) });
+    const updated = await response.json();
+    if (!response.ok) throw new Error(updated.error || '查询失败');
+    renderPaymentTask(updated);
+    schedulePaymentTaskPoll(updated);
+  } catch (error) {
+    log.textContent = `支付结果查询失败：${error.message}`;
+  }
+}
+
+async function showGeneratedLinks(result) {
+  links.replaceChildren();
+  const values = result?.links || {};
+  for (const [label, value] of [['结账链接', values.short], ['托管链接', values.hosted], ['GCash', values.gcash]]) {
+    if (!safeExternalUrl(value)) continue;
+    const line = document.createElement('div');
+    const anchor = document.createElement('a');
+    anchor.href = value;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+    anchor.textContent = value;
+    line.append(`${label}：`, anchor);
+    links.append(line);
+  }
+}
+link.onclick = async () => {
+  const value = getSess(); if (!value) return;
+  setPaymentButtonsDisabled(true);
+  fill.style.width = '18%';
+  log.textContent = '正在生成支付链接…';
+  links.replaceChildren();
+  try {
+    const response = await fetch('/api/links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionJson: value, plan: plan.value })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || '链接生成失败');
+    fill.style.width = '100%';
+    log.textContent = result.state === 'disabled' ? '测试环境未执行真实链接生成' : '支付链接已生成';
+    await showGeneratedLinks(result);
+  } catch (error) {
+    fill.style.width = '100%';
+    log.textContent = `链接生成失败：${error.message}`;
+  } finally {
+    setPaymentButtonsDisabled(false);
+  }
+};
+batch.onclick = async () => {
+  setPaymentButtonsDisabled(true);
+  fill.style.width = '18%';
+  log.textContent = '正在批量生成支付链接…';
+  links.replaceChildren();
+  try {
+    const response = await fetch('/api/links/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: plan.value, concurrency: conc.value || 1 })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || '批量链接生成失败');
+    fill.style.width = '100%';
+    log.textContent = `批量链接任务完成：${result.results?.filter(item => item.ok).length || 0}/${result.total || 0}`;
+    for (const item of result.results || []) {
+      const value = item.links?.short || item.links?.hosted;
+      if (!safeExternalUrl(value)) continue;
+      const line = document.createElement('div');
+      const anchor = document.createElement('a');
+      anchor.href = value; anchor.target = '_blank'; anchor.rel = 'noopener noreferrer';
+      anchor.textContent = value;
+      line.append(`${item.email || item.accountId}：`, anchor);
+      links.append(line);
+    }
+  } catch (error) {
+    fill.style.width = '100%';
+    log.textContent = `批量链接生成失败：${error.message}`;
+  } finally {
+    setPaymentButtonsDisabled(false);
+  }
+};
+batchpay.onclick = () => {
+  submitBatchPayment();
+};
+
+// 验证服务与代理：始终展开；密钥只显示脱敏状态。
+(function wireValidationSettings() {
+  const stat = document.getElementById('solverstat');
+  const keyInput = document.getElementById('solver-key');
+  const wsInput = document.getElementById('solver-ws');
+  let solverState = {};
+
+  const loadSolver = async () => {
+    try {
+      solverState = await (await fetch('/api/solver')).json();
+      keyInput.value = '';
+      keyInput.placeholder = solverState.apiKeySet ? `${solverState.apiKeyMasked}（已保存，留空不改）` : 'CAP-xxxxxxxx';
+      wsInput.value = solverState.browserWs || '';
+      keyInput.disabled = Boolean(solverState.apiKeyEnv);
+      wsInput.disabled = Boolean(solverState.browserWsEnv);
+      document.getElementById('solver-clear-key').disabled = Boolean(solverState.apiKeyEnv);
+      document.getElementById('solver-clear-ws').disabled = Boolean(solverState.browserWsEnv);
+      document.getElementById('solver-clear-all').disabled = Boolean(solverState.apiKeyEnv && solverState.browserWsEnv);
+      stat.className = `impstat${solverState.apiKeySet ? ' ok' : ''}`;
+      stat.textContent = solverState.apiKeySet ? '备用验证已配置' : '使用本地验证';
+    } catch (error) {
+      stat.className = 'impstat err';
+      stat.textContent = `读取失败：${error.message}`;
+    }
+  };
+
+  document.getElementById('solversave').onclick = async () => {
+    const payload = {};
+    if (!solverState.browserWsEnv) payload.browserWs = wsInput.value.trim();
+    if (!solverState.apiKeyEnv && keyInput.value.trim()) payload.apiKey = keyInput.value.trim();
+    const d = await (await fetch('/api/solver', { method: 'POST', body: JSON.stringify(payload) })).json();
+    stat.className = `impstat ${d.error ? 'err' : 'ok'}`;
+    stat.textContent = d.error ? `✗ ${d.error}` : '✓ 已保存';
+    await loadSolver();
+  };
+  document.getElementById('solvertest').onclick = async () => {
+    stat.className = 'impstat';
+    stat.textContent = '测试连接中…';
+    try {
+      const d = await (await fetch('/api/solver/test', { method: 'POST' })).json();
+      stat.className = `impstat ${d.error ? 'err' : 'ok'}`;
+      stat.textContent = d.error ? `✗ ${d.error}` : `✓ 连接成功，余额 $${d.balance}`;
+    } catch (error) {
+      stat.className = 'impstat err';
+      stat.textContent = `✗ ${error.message}`;
+    }
+  };
+  const clearSolver = async field => {
+    await fetch('/api/solver', { method: 'DELETE', body: JSON.stringify({ field }) });
+    await loadSolver();
+  };
+  document.getElementById('solver-clear-key').onclick = () => clearSolver('apiKey');
+  document.getElementById('solver-clear-ws').onclick = () => clearSolver('browserWs');
+  document.getElementById('solver-clear-all').onclick = () => clearSolver('all');
+  const solverFile = document.getElementById('solver-file');
+  document.getElementById('solverimport').onclick = () => solverFile.click();
+  solverFile.onchange = async () => {
+    const text = await solverFile.files[0]?.text();
+    if (!text) return;
+    let imported = {};
+    try { imported = JSON.parse(text); } catch {
+      for (const row of text.split(/\r?\n/)) {
+        const [name, ...rest] = row.split('=');
+        if (/^(apiKey|key)$/i.test(name?.trim())) imported.apiKey = rest.join('=').trim();
+        if (/^(browserWs|url|ws)$/i.test(name?.trim())) imported.browserWs = rest.join('=').trim();
+      }
+    }
+    if (!solverState.apiKeyEnv && imported.apiKey) keyInput.value = String(imported.apiKey);
+    if (!solverState.browserWsEnv && imported.browserWs) wsInput.value = String(imported.browserWs);
+    stat.textContent = '已读取配置，点击“保存设置”生效';
+  };
+
+  const proxyEditor = document.getElementById('proxy-editor');
+  const proxyList = document.getElementById('proxy-list');
+  const proxyStat = document.getElementById('proxy-stat');
+  let proxyView = {};
+  const loadProxy = async () => {
+    proxyView = await (await fetch('/api/proxy-config')).json();
+    proxyEditor.disabled = Boolean(proxyView.locked);
+    document.getElementById('proxy-save').disabled = Boolean(proxyView.locked);
+    document.getElementById('proxy-import').disabled = Boolean(proxyView.locked);
+    document.getElementById('proxy-clear').disabled = Boolean(proxyView.locked);
+    document.getElementById('proxy-manage').disabled = !proxyView.count;
+    proxyEditor.placeholder = proxyView.count ? `已保存 ${proxyView.count} 条（账号密码不会回显）` : '127.0.0.1:8080\nhost:port:user:pass';
+    proxyList.replaceChildren();
+    proxyStat.className = 'impstat';
+    proxyStat.textContent = proxyView.count
+      ? (proxyView.locked ? `环境托管 · ${proxyView.count} 条` : `${proxyView.count} 条代理`)
+      : '直连当前网络';
+  };
+  const openProxyManager = () => {
+    document.getElementById('modal-title').textContent = `代理池（${proxyView.count || 0} 条）`;
+    const box = document.getElementById('modal-items');
+    box.replaceChildren();
+    for (const item of proxyView.items || []) {
+      const row = document.createElement('div');
+      row.className = 'proxy-item';
+      const label = document.createElement('code');
+      label.textContent = item.label;
+      const actions = document.createElement('span');
+      const test = document.createElement('button');
+      test.className = 'btn-sm';
+      test.textContent = '测试';
+      test.onclick = async () => {
+        test.disabled = true;
+        test.textContent = '测试中…';
+        const result = await (await fetch('/api/proxy-config/test', { method: 'POST', body: JSON.stringify({ index: item.index }) })).json();
+        test.disabled = false;
+        test.textContent = result.ok ? `${result.latencyMs}ms` : '连接失败';
+      };
+      actions.append(test);
+      if (proxyView.source === 'saved' && !proxyView.locked) {
+        const remove = document.createElement('button');
+        remove.className = 'btn-sm danger';
+        remove.textContent = '删除';
+        remove.onclick = async () => {
+          await fetch(`/api/proxy-config?index=${item.index}`, { method: 'DELETE' });
+          await loadProxy();
+          openProxyManager();
+        };
+        actions.append(remove);
+      }
+      row.append(label, actions);
+      box.append(row);
+    }
+    document.getElementById('modal-mask').classList.add('show');
+  };
+  document.getElementById('proxy-manage').onclick = openProxyManager;
+  document.getElementById('proxy-save').onclick = async () => {
+    const d = await (await fetch('/api/proxy-config', { method: 'PUT', body: JSON.stringify({ text: proxyEditor.value }) })).json();
+    proxyStat.className = `impstat ${d.ok ? 'ok' : 'err'}`;
+    proxyStat.textContent = d.ok ? `已保存 ${d.valid} 条 · 去重 ${d.duplicate} · 无效 ${d.invalid}` : `保存失败：${d.error}`;
+    if (d.ok) { proxyEditor.value = ''; await loadProxy(); }
+  };
+  document.getElementById('proxy-clear').onclick = async () => {
+    if (!confirm('清空本地代理设置？运行中的任务不会切换代理。')) return;
+    await fetch('/api/proxy-config', { method: 'DELETE' });
+    proxyEditor.value = '';
+    await loadProxy();
+  };
+  const proxyFile = document.getElementById('proxy-file');
+  document.getElementById('proxy-import').onclick = () => proxyFile.click();
+  proxyFile.onchange = async () => {
+    const text = await proxyFile.files[0]?.text();
+    if (text) proxyEditor.value = text;
+  };
+
+  loadSolver();
+  loadProxy();
+})();
+
+// 3DS 队列只展示账号；详情弹窗不暴露完整卡号或 CVC。
+(function wireThreeDsPanel() {
+  const pendingButton = document.getElementById('three-ds-pending-view');
+  const completedButton = document.getElementById('three-ds-completed-view');
+  const pendingCount = document.getElementById('three-ds-pending-count');
+  const completedCount = document.getElementById('three-ds-completed-count');
+  const stateName = task => task.state === 'completing_3ds' ? '确认中' : task.state === 'succeeded' ? '已完成' : '待验证';
+  const emailOf = task => task.email || '待识别账号';
+  const addCell = (grid, title, value) => {
+    const cell = document.createElement('div');
+    cell.className = 'detail-cell';
+    const strong = document.createElement('strong');
+    strong.textContent = title;
+    cell.append(strong, document.createTextNode(value || '—'));
+    grid.append(cell);
+  };
+  const openDetail = async task => {
+    const response = await fetch(`/api/payment-tasks/${task.id}/three-ds-detail`);
+    const detail = await response.json();
+    if (!response.ok) return openInfo('3DS 详情', [detail.error || '记录不存在']);
+    const current = detail.task;
+    const card = detail.card;
+    const account = detail.account;
+    const completed = current.state === 'succeeded';
+    document.getElementById('modal-title').textContent = emailOf(current);
+    const box = document.getElementById('modal-items');
+    box.replaceChildren();
+    const grid = document.createElement('div');
+    grid.className = 'detail-grid';
+    addCell(grid, '账号等级', `首次：${current.accountPlanBefore || '未知'}\n当前：${current.accountPlanCurrent || account?.accountStatus?.plan || '待查询'}\n目标：${paymentPlanNames[current.plan] || current.plan || '未知'}`);
+    addCell(grid, '任务状态', `${stateName(current)}${current.accountCheckErrorCode ? ` · ${current.accountCheckErrorCode}` : ''}`);
+    const usage = card?.usage || {};
+    addCell(grid, '支付卡', `${card?.masked || `•••• ${current.cardLast4 || '----'}`}${card?.name ? ` · ${card.name}` : ''}\n使用 ${usage.attemptCount || 0} 次 · 成功 ${usage.successCount || 0} 次 · 3DS ${usage.threeDsCount || 0} 次`);
+    const amount = Number.isInteger(current.amount) ? `${(current.amount / 100).toFixed(2)} ${current.currency || ''}` : '待平台返回';
+    const next = current.nextAccountCheckAt && !completed ? Math.max(0, Math.ceil((Date.parse(current.nextAccountCheckAt) - Date.now()) / 1000)) : 0;
+    addCell(grid, '支付信息', `${paymentPlanNames[current.plan] || current.plan || '套餐未知'} · ${amount}${next ? `\n下次等级检测：${next} 秒后` : ''}`);
+    box.append(grid);
+    const actions = document.createElement('div');
+    actions.className = 'config-tools';
+    const open = document.createElement('a');
+    open.className = 'btn-sm';
+    open.textContent = completed ? '验证已完成' : '打开验证链接';
+    open.href = completed ? '#' : current.verificationUrl;
+    open.target = '_blank';
+    open.rel = 'noopener noreferrer';
+    if (completed || !current.verificationUrl) {
+      open.removeAttribute('href');
+      open.setAttribute('aria-disabled', 'true');
+      open.style.opacity = '.5';
+    }
+    const copy = document.createElement('button');
+    copy.className = 'btn-sm';
+    copy.textContent = '复制链接';
+    copy.disabled = completed || !current.verificationUrl;
+    copy.onclick = async () => {
+      await navigator.clipboard.writeText(current.verificationUrl);
+      copy.textContent = '已复制';
+    };
+    actions.append(open, copy);
+    if (['pending_3ds', 'unknown'].includes(current.state)) {
+      const cancel = document.createElement('button');
+      cancel.className = 'btn-sm danger';
+      cancel.textContent = '取消任务并释放资源';
+      cancel.onclick = async () => {
+        if (!confirm('取消这个待处理任务并释放账号、卡和地址？')) return;
+        const response = await fetch(`/api/payment-tasks/${current.id}/cancel`, { method: 'POST' });
+        const result = await response.json();
+        if (!response.ok) return openInfo('取消失败', [result.error || '任务当前不可取消']);
+        closeModal();
+        window.dispatchEvent(new Event('dipay-payment-finished'));
+      };
+      actions.append(cancel);
+    }
+    box.append(actions);
+    document.getElementById('modal-mask').classList.add('show');
+  };
+  const taskRow = (task, completed) => {
+    const row = document.createElement('button');
+    row.className = 'three-ds-item';
+    row.type = 'button';
+    const dot = document.createElement('span');
+    dot.className = `state-dot${completed ? ' done' : ''}`;
+    const email = document.createElement('span');
+    email.textContent = emailOf(task);
+    const tag = document.createElement('span');
+    tag.className = 'state-tag';
+    tag.textContent = stateName(task);
+    row.append(dot, email, tag);
+    row.onclick = () => openDetail(task);
+    return row;
+  };
+  const openTaskList = (title, tasks, completed) => {
+    document.getElementById('modal-title').textContent = title;
+    const modalBox = document.getElementById('modal-items');
+    if (tasks.length) {
+      modalBox.replaceChildren(...tasks.map(task => taskRow(task, completed)));
+    } else {
+      const empty = document.createElement('span');
+      empty.className = 'success-empty';
+      empty.textContent = completed ? '暂无完成记录' : '暂无待验证账号';
+      modalBox.replaceChildren(empty);
+    }
+    document.getElementById('modal-mask').classList.add('show');
+  };
+  const renderSummary = (button, count, tasks, label, completed) => {
+    count.textContent = String(tasks.length);
+    button.setAttribute('aria-label', `${label} ${tasks.length} 个账号`);
+    button.onclick = () => openTaskList(label, tasks, completed);
+  };
+  const refresh = async () => {
+    try {
+      const tasks = await (await fetch('/api/payment-tasks?limit=300')).json();
+      const threeDs = tasks.filter(task => task.threeDsDetectedAt);
+      const pendingTasks = threeDs.filter(task => ['pending_3ds', 'completing_3ds'].includes(task.state));
+      const completedTasks = threeDs.filter(task => task.state === 'succeeded' && task.completionSource === 'account_tier_after_3ds').slice(0, 20);
+      renderSummary(pendingButton, pendingCount, pendingTasks, '待验证账号', false);
+      renderSummary(completedButton, completedCount, completedTasks, '最近完成', true);
+    } catch {}
+  };
+  window.addEventListener('dipay-payment-progress', refresh);
+  window.addEventListener('dipay-payment-finished', refresh);
+  refresh();
+  window.setInterval(refresh, 5000);
+})();
+
+// 资源层：文件逐个导入、列表脱敏、选择状态可见。
+(() => {
+  const configs = {
+    accounts: { section: 'account-resource', listId: 'acclist', count: 'account-count', name: '账号库', unit: '个', accept: '*/*' },
+    cards: { section: 'card-resource', listId: 'cardlist', count: 'card-count', name: '卡库', unit: '张', accept: '.json,.csv,.txt', template: { filename: 'cards.csv', type: 'text/csv;charset=utf-8', text: 'number,exp,cvc,name\n' } },
+    addresses: { section: 'address-resource', listId: 'addrlist', count: 'address-count', name: '地址库', unit: '条', accept: '.json,.csv,.txt', template: { filename: 'addresses.csv', type: 'text/csv;charset=utf-8', text: 'line1,city,state,zip,country\n' } }
+  };
+  const labels = { accounts: '账号：未选择', cards: '卡：手动输入', addresses: '地址：手动输入' };
+  let drawerKind = null, drawerFiles = [], temporaryAddress = false, selectedAccountResourceId = '', selectedCardResourceId = '', selectedAddressResourceId = '';
+  const detail = document.getElementById('payment-details');
+  const cardNameInput = document.getElementById('name');
+  const summary = document.createElement('div');
+  summary.className = 'task-resource-summary'; summary.setAttribute('aria-live', 'polite');
+  const choiceDefinitions = [
+    { kind: 'accounts', title: '账号', valueId: 'selected-account', action: '选择' },
+    { kind: 'cards', title: '支付卡', valueId: 'selected-card', action: '选择' },
+    { kind: 'addresses', title: '账单地址', valueId: 'selected-address', action: '选择' },
+  ];
+  for (const definition of choiceDefinitions) {
+    const row = document.createElement('div');
+    row.className = 'resource-choice-row';
+    row.dataset.resourceKind = definition.kind;
+    const copy = document.createElement('div');
+    copy.className = 'resource-choice-copy';
+    const title = document.createElement('span');
+    title.textContent = definition.title;
+    const value = document.createElement('strong');
+    value.id = definition.valueId;
+    copy.append(title, value);
+    const actions = document.createElement('div');
+    actions.className = 'resource-choice-actions';
+    const choose = document.createElement('button');
+    choose.type = 'button';
+    choose.textContent = definition.action;
+    choose.onclick = () => (
+      definition.kind === 'accounts'
+        ? openAccountLibrary()
+        : definition.kind === 'cards'
+          ? openCardLibrary()
+          : openAddressLibrary()
+    );
+    actions.append(choose);
+    if (definition.kind === 'addresses') {
+      const temporary = document.createElement('button');
+      temporary.type = 'button';
+      temporary.textContent = '临时地址';
+      temporary.onclick = () => ensureTaskAddress(true);
+      actions.append(temporary);
+    }
+    row.append(copy, actions);
+    summary.append(row);
+  }
+  detail.before(summary);
+  const saveTemporary = document.createElement('button');
+  saveTemporary.type = 'button'; saveTemporary.className = 'btn-sm'; saveTemporary.id = 'save-temporary-address';
+  saveTemporary.textContent = '保存本次临时地址到地址库'; saveTemporary.hidden = true;
+  detail.append(saveTemporary);
+  const setLabel = (kind, text) => {
+    labels[kind] = text;
+    const id = kind === 'addresses' ? 'selected-address' : kind === 'accounts' ? 'selected-account' : 'selected-card';
+    document.getElementById(id).textContent = text.includes('：') ? text.slice(text.indexOf('：') + 1) : text;
+  };
+  setLabel('accounts', labels.accounts); setLabel('cards', labels.cards); setLabel('addresses', labels.addresses);
+  document.querySelector('.btns').insertAdjacentHTML('afterend', '<p class="batch-scope-hint">批量功能仍按现有资源库范围执行，不使用这里的单笔选择。</p>');
+
+  async function refresh(kind) {
+    const config = configs[kind];
+    const list = await (await fetch(`/api/${kind}`)).json();
+    document.getElementById(config.count).textContent = list.length;
+    const cardUsage = item => `使用 ${item.usage?.attemptCount || 0} 次 · 已支付账号 ${item.usage?.paidAccountCount || 0} · 成功 ${item.usage?.successCount || 0} 次 · 3DS ${item.usage?.threeDsCount || 0} 次${item.usage?.hasThreeDs ? ' · 触发过 3DS' : ''}`;
+    const usageLabel = item => kind === 'cards' ? ` · ${cardUsage(item)}` : item.usage?.state === 'in_use'
+      ? ` · 使用中 · 已支付账号 ${item.usage?.paidAccountCount || 0}`
+      : item.usage?.state === 'cooldown'
+        ? ` · 冷却中 · 已支付账号 ${item.usage?.paidAccountCount || 0}`
+        : item.usage?.state === 'insufficient_funds'
+          ? ` · 余额不足（已暂停） · 已支付账号 ${item.usage?.paidAccountCount || 0}`
+        : ` · 已支付账号 ${item.usage?.paidAccountCount || 0}`;
+    const accountStateLabel = item => item.payment
+      ? `已完成 ${(item.payment.amount / 100).toFixed(2)} ${item.payment.currency}${item.payment.via3ds ? ' · 3DS' : ''}`
+      : item.accountStatus?.state === 'free' ? '无套餐'
+        : item.accountStatus?.state === 'active' ? `已有套餐 ${item.accountStatus.plan || ''}`
+          : item.accountStatus?.state === 'invalid' ? '凭证失效'
+            : item.accountStatus?.state === 'error' ? '检测失败'
+              : '检测中';
+    const labelOf = item => kind === 'accounts' ? `${item.label} · ${accountStateLabel(item)}` : kind === 'cards' ? `${item.masked}${item.name ? ` ${item.name}` : ''}${usageLabel(item)}` : `${item.label}${usageLabel(item)}`;
+    const onPick = item => useResource(kind, item);
+    resourceLibraries[config.listId] = { list, name: config.name, unit: config.unit, labelOf, onPick };
+    return list;
+  }
+  async function refreshAll() { await Promise.all(Object.keys(configs).map(refresh)); }
+  window.addEventListener('dipay-payment-finished', refreshAll);
+  window.addEventListener('dipay-payment-progress', refreshAll);
+
+  const accountDetectButton = document.getElementById('account-detect-import');
+  const accountDetectResult = document.getElementById('account-detect-result');
+  const accountStateText = item => item?.accountStatus?.state === 'free'
+    ? '无套餐，可使用'
+    : item?.accountStatus?.state === 'active'
+      ? `已有套餐 ${item.accountStatus.plan || ''}`.trim()
+      : item?.accountStatus?.state === 'invalid'
+        ? '凭证失效'
+        : item?.accountStatus?.state === 'error'
+          ? '状态检测失败'
+          : '状态检测中';
+  accountDetectButton.onclick = async () => {
+    const text = sess.value.trim();
+    accountDetectResult.className = '';
+    if (!text) {
+      accountDetectResult.className = 'err';
+      accountDetectResult.textContent = '请先粘贴账号信息';
+      return;
+    }
+    accountDetectButton.disabled = true;
+    accountDetectButton.textContent = '检测中…';
+    accountDetectResult.textContent = '正在识别凭证并查询账号状态';
+    try {
+      const response = await fetch('/api/resources/accounts/detect-import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || '账号检测失败');
+      await refresh('accounts');
+      const item = Array.isArray(result.items) && result.items.length === 1 ? result.items[0] : null;
+      if (item?.accountStatus?.state === 'free') await useResource('accounts', item);
+      const summary = [
+        `新增 ${result.added || 0}`,
+        `重复 ${result.duplicate || 0}`,
+        `无效 ${result.rejected || 0}`
+      ].join(' · ');
+      accountDetectResult.className = item?.accountStatus?.state === 'free' ? 'ok' : (result.rejected ? 'err' : '');
+      accountDetectResult.textContent = item
+        ? `${item.label} · ${accountStateText(item)} · ${summary}`
+        : `${summary}${result.rejected ? ' · 错误凭证未入库' : ''}`;
+    } catch (error) {
+      accountDetectResult.className = 'err';
+      accountDetectResult.textContent = `检测失败：${error.message}`;
+    } finally {
+      accountDetectButton.disabled = false;
+      accountDetectButton.textContent = '检测并入库';
+    }
+  };
+
+  function appendLibraryTools(kind, box, reopen) {
+    const tools = document.createElement('div');
+    tools.className = 'modal-library-tools';
+    const hint = document.createElement('span');
+    hint.textContent = '点击条目可选择；删除和清空不会影响使用中的资源';
+    const clear = document.createElement('button');
+    clear.type = 'button';
+    clear.className = 'btn-sm danger';
+    clear.textContent = '清空全部';
+    clear.onclick = async () => {
+      await clearResourceLibrary(kind);
+      reopen();
+    };
+    tools.append(hint, clear);
+    box.append(tools);
+  }
+
+  function openAccountLibrary() {
+    const view = resourceLibraries.acclist;
+    if (!view.list.length) { openInfo('账号库', ['账号库为空，请先导入账号。']); return; }
+    const mask = document.getElementById('modal-mask');
+    const box = document.getElementById('modal-items');
+    document.getElementById('modal-title').textContent = `账号库（共 ${view.list.length} 个）`;
+    box.replaceChildren();
+    appendLibraryTools('accounts', box, openAccountLibrary);
+    for (const item of view.list) {
+      const row = document.createElement('div'); row.className = 'drawer-file';
+      const info = document.createElement('span');
+      const status = document.createElement('small');
+      info.textContent = item.label;
+      status.textContent = item.payment
+        ? `已完成 · ${(item.payment.amount / 100).toFixed(2)} ${item.payment.currency}${item.payment.plan ? ` · ${item.payment.plan}` : ''}${item.payment.via3ds ? ' · 触发过 3DS' : ''}`
+        : item.accountStatus?.state === 'free' ? '无套餐，可支付'
+          : item.accountStatus?.state === 'active' ? `已有套餐 · ${item.accountStatus.plan || '付费套餐'}`
+            : item.accountStatus?.state === 'invalid' ? '凭证失效'
+              : item.accountStatus?.state === 'error' ? '检测失败'
+                : '状态检测中';
+      info.append(document.createElement('br'), status);
+      const actions = document.createElement('span');
+      const use = document.createElement('button'); use.className = 'btn-sm'; use.textContent = '选择';
+      use.disabled = Boolean(item.payment) || item.accountStatus?.state !== 'free' || item.usage?.state === 'in_use';
+      use.onclick = async () => { await useResource('accounts', item); closeModal(); };
+      const check = document.createElement('button'); check.className = 'btn-sm'; check.textContent = '重新检测';
+      check.onclick = async () => {
+        await fetch(`/api/resources/accounts/${item.id}/check`, { method: 'POST' });
+        await refresh('accounts'); openAccountLibrary();
+      };
+      const remove = document.createElement('button'); remove.className = 'btn-sm danger'; remove.textContent = '删除';
+      remove.disabled = item.usage?.state === 'in_use';
+      remove.onclick = async () => {
+        if (!confirm(`删除账号 ${item.label}？`)) return;
+        await fetch(`/api/resources/accounts/${item.id}`, { method: 'DELETE' });
+        if (selectedAccountResourceId === item.id) { selectedAccountResourceId = ''; sess.value = ''; setLabel('accounts', '账号：未选择'); }
+        await refresh('accounts'); openAccountLibrary();
+      };
+      actions.append(use, check, remove); row.append(info, actions); box.append(row);
+    }
+    mask.classList.add('show');
+  }
+
+  function openCardLibrary() {
+    const view = resourceLibraries.cardlist;
+    if (!view.list.length) { openInfo('卡库', ['卡库为空，请先导入支付卡。']); return; }
+    const mask = document.getElementById('modal-mask');
+    const box = document.getElementById('modal-items');
+    document.getElementById('modal-title').textContent = `卡库（共 ${view.list.length} 张）`;
+    box.replaceChildren();
+    appendLibraryTools('cards', box, openCardLibrary);
+    for (const item of view.list) {
+      const row = document.createElement('div'); row.className = 'drawer-file';
+      const info = document.createElement('span');
+      const status = document.createElement('small');
+      info.textContent = `${item.masked}${item.name ? ` · ${item.name}` : ''}`;
+      const cardState = item.usage?.state === 'insufficient_funds' ? '余额不足，已暂停'
+        : item.usage?.state === 'cooldown' ? '冷却中'
+          : item.usage?.state === 'in_use' ? '使用中' : '可用';
+      status.textContent = `${cardState} · 使用 ${item.usage?.attemptCount || 0} 次 · 已支付账号 ${item.usage?.paidAccountCount || 0} · 成功 ${item.usage?.successCount || 0} 次 · 3DS ${item.usage?.threeDsCount || 0} 次${item.usage?.hasThreeDs ? ' · 触发过 3DS' : ''}`;
+      info.append(document.createElement('br'), status);
+      const actions = document.createElement('span');
+      const use = document.createElement('button'); use.className = 'btn-sm'; use.textContent = '选择';
+      use.disabled = ['in_use', 'cooldown', 'insufficient_funds'].includes(item.usage?.state);
+      use.onclick = async () => { await useResource('cards', item); closeModal(); };
+      actions.append(use);
+      if (item.usage?.state === 'insufficient_funds') {
+        const restore = document.createElement('button'); restore.className = 'btn-sm'; restore.textContent = '恢复使用';
+        restore.onclick = async () => {
+          await fetch(`/api/resources/cards/${item.id}/restore`, { method: 'POST' });
+          await refresh('cards'); openCardLibrary();
+        };
+        actions.append(restore);
+      }
+      const remove = document.createElement('button'); remove.className = 'btn-sm danger'; remove.textContent = '删除';
+      remove.disabled = item.usage?.state === 'in_use';
+      remove.onclick = async () => {
+        if (!confirm(`删除支付卡 ${item.masked}？`)) return;
+        await fetch(`/api/resources/cards/${item.id}`, { method: 'DELETE' });
+        if (selectedCardResourceId === item.id) {
+          selectedCardResourceId = '';
+          num.value = ''; exp.value = ''; cvc.value = ''; cardNameInput.value = '';
+          setLabel('cards', '卡：手动输入');
+        }
+        await refresh('cards'); openCardLibrary();
+      };
+      actions.append(remove);
+      row.append(info, actions); box.append(row);
+    }
+    mask.classList.add('show');
+  }
+
+  function openAddressLibrary() {
+    const view = resourceLibraries.addrlist;
+    if (!view.list.length) { openInfo('地址库', ['地址库为空；支付前会自动生成本次临时地址。']); return; }
+    const box = document.getElementById('modal-items');
+    document.getElementById('modal-title').textContent = `地址库（共 ${view.list.length} 条）`;
+    box.replaceChildren();
+    appendLibraryTools('addresses', box, openAddressLibrary);
+    for (const item of view.list) {
+      const row = document.createElement('div'); row.className = 'drawer-file';
+      const info = document.createElement('span');
+      const status = document.createElement('small');
+      info.textContent = item.label;
+      status.textContent = `${item.usage?.state === 'in_use' ? '使用中' : '可用'} · 已支付账号 ${item.usage?.paidAccountCount || 0}`;
+      info.append(document.createElement('br'), status);
+      const actions = document.createElement('span');
+      const use = document.createElement('button'); use.className = 'btn-sm'; use.textContent = '选择';
+      use.disabled = item.usage?.state === 'in_use';
+      use.onclick = async () => { await useResource('addresses', item); closeModal(); };
+      const remove = document.createElement('button'); remove.className = 'btn-sm danger'; remove.textContent = '删除';
+      remove.disabled = item.usage?.state === 'in_use';
+      remove.onclick = async () => {
+        if (!confirm(`删除地址 ${item.label}？`)) return;
+        await fetch(`/api/resources/addresses/${item.id}`, { method: 'DELETE' });
+        if (selectedAddressResourceId === item.id) {
+          selectedAddressResourceId = '';
+          line1.value = ''; city.value = ''; state.value = ''; zip.value = ''; country.value = '';
+          setLabel('addresses', '地址：手动输入');
+        }
+        await refresh('addresses'); openAddressLibrary();
+      };
+      actions.append(use, remove); row.append(info, actions); box.append(row);
+    }
+    document.getElementById('modal-mask').classList.add('show');
+  }
+
+  async function clearResourceLibrary(kind) {
+    const config = configs[kind];
+    const count = resourceLibraries[config.listId].list.length;
+    if (!count || !confirm(`清空${config.name}全部 ${count} ${config.unit}？`)) return;
+    const response = await fetch(`/api/resources/${kind}/clear`, { method: 'POST' });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      log.textContent = `清空失败：${result.error || '资源正在使用'}`;
+      return;
+    }
+    if (kind === 'accounts') {
+      selectedAccountResourceId = ''; sess.value = ''; setLabel('accounts', '账号：未选择');
+    } else if (kind === 'cards') {
+      selectedCardResourceId = ''; num.value = ''; exp.value = ''; cvc.value = ''; cardNameInput.value = ''; setLabel('cards', '卡：手动输入');
+    } else {
+      selectedAddressResourceId = ''; temporaryAddress = false;
+      line1.value = ''; city.value = ''; state.value = ''; zip.value = ''; country.value = '';
+      saveTemporary.hidden = true; setLabel('addresses', '地址：手动输入');
+    }
+    await refresh(kind);
+  }
+
+  async function useResource(kind, item) {
+    const data = await (await fetch(`/api/resources/${kind}/use`, { method: 'POST', body: JSON.stringify({ id: item.id }) })).json();
+    if (data.error) { log.textContent = `资源选择失败：${data.error}`; return; }
+    if (kind === 'accounts') { sess.value = JSON.stringify(data); selectedAccountResourceId = item.id; setLabel(kind, `账号：${item.label}`); }
+    if (kind === 'cards') { num.value = data.number || ''; exp.value = data.exp || ''; cvc.value = data.cvc || ''; cardNameInput.value = data.name || ''; selectedCardResourceId = item.id; setLabel(kind, `卡：${item.masked}`); }
+    if (kind === 'addresses') { line1.value = data.line1 || ''; city.value = data.city || ''; state.value = data.state || ''; zip.value = data.zip || ''; country.value = data.country || ''; selectedAddressResourceId = item.id; temporaryAddress = false; saveTemporary.hidden = true; setLabel(kind, `地址：${item.label}`); }
+    log.textContent = `已选择${configs[kind].name}`;
+  }
+
+  function renderDrawer() {
+    const config = configs[drawerKind], box = document.getElementById('modal-items');
+    box.innerHTML = '';
+    if (config.template) {
+      const template = document.createElement('button'); template.className = 'btn-sm'; template.type = 'button'; template.dataset.resourceTemplate = drawerKind; template.textContent = `下载${config.name}模板`;
+      template.onclick = () => downloadTemplate(config.template); box.append(template);
+    }
+    const pick = document.createElement('button'); pick.className = 'btn-sm'; pick.textContent = '+ 选择文件'; pick.onclick = () => document.getElementById('resource-file-picker').click(); box.append(pick);
+    const input = document.createElement('input'); input.id = 'resource-file-picker'; input.type = 'file'; input.multiple = true; input.accept = config.accept; input.hidden = true;
+    input.onchange = () => { drawerFiles.push(...input.files); renderDrawer(); }; box.append(input);
+    for (const [index, file] of drawerFiles.entries()) {
+      const row = document.createElement('div'); row.className = 'drawer-file';
+      const info = document.createElement('span');
+      const state = document.createElement('small');
+      info.append(document.createTextNode(file.name), document.createElement('br'));
+      state.textContent = file._state || '等待导入';
+      info.append(state);
+      row.append(info);
+      const remove = document.createElement('button'); remove.className = 'btn-sm danger'; remove.textContent = '移除'; remove.onclick = () => { drawerFiles.splice(index, 1); renderDrawer(); }; row.append(remove); box.append(row);
+    }
+    const start = document.createElement('button'); start.className = 'btn-sm'; start.textContent = `开始导入（${drawerFiles.length} 个文件）`; start.disabled = !drawerFiles.length; start.onclick = startImport; box.append(start);
+  }
+  function downloadTemplate(template) {
+    const url = URL.createObjectURL(new Blob([template.text], { type: template.type }));
+    const link = document.createElement('a'); link.href = url; link.download = template.filename; link.click();
+    URL.revokeObjectURL(url);
+  }
+  function openImportDrawer(kind) { drawerKind = kind; drawerFiles = []; document.getElementById('modal-title').textContent = `导入${configs[kind].name}`; document.getElementById('modal-mask').classList.add('show'); renderDrawer(); }
+  async function startImport() {
+    for (const file of drawerFiles) {
+      if (file._state?.startsWith('新增')) continue;
+      file._state = '解析中…'; renderDrawer();
+      try {
+        const result = await (await fetch(`/api/resources/${drawerKind}/import`, { method: 'POST', body: JSON.stringify({ file: { name: file.name, text: await file.text() } }) })).json();
+        const reasons = (result.errors || []).slice(0, 3).map(error => `第${error.line ?? '？'}行：${error.reason}`).join('；');
+        file._state = result.error ? `失败：${result.error}` : `新增 ${result.added} · 重复 ${result.duplicate} · 无效 ${result.errors.length}${reasons ? `（${reasons}）` : ''}`;
+      } catch (error) { file._state = `失败：${error.message}`; }
+      renderDrawer();
+    }
+    await refresh(drawerKind);
+  }
+  for (const [kind, config] of Object.entries(configs)) {
+    const section = document.getElementById(config.section);
+    section.querySelector('.resource-import').onclick = () => openImportDrawer(kind);
+    section.querySelector('.resource-select').onclick = () => (
+      kind === 'accounts' ? openAccountLibrary() : kind === 'cards' ? openCardLibrary() : openAddressLibrary()
+    );
+    const legacyBody = section.querySelector('.resource-body');
+    if (legacyBody) legacyBody.hidden = true;
+  }
+
+  async function ensureTaskAddress(force = false) {
+    if (!force && line1.value.trim() && city.value.trim() && state.value.trim() && zip.value.trim() && country.value.trim()) return;
+    const data = await (await fetch('/api/addresses/temporary', { method: 'POST' })).json();
+    if (data.error) throw new Error(data.error);
+    line1.value = data.line1; city.value = data.city; state.value = data.state; zip.value = data.zip; country.value = data.country;
+    selectedAddressResourceId = ''; temporaryAddress = true; saveTemporary.hidden = false; detail.open = true; setLabel('addresses', '地址：本次临时地址');
+  }
+  saveTemporary.onclick = async () => {
+    const address = { line1: line1.value, city: city.value, state: state.value, zip: zip.value, country: country.value };
+    const result = await (await fetch('/api/resources/addresses/import', { method: 'POST', body: JSON.stringify({ file: { name: 'temporary-address.json', text: JSON.stringify(address) } }) })).json();
+    if (!result.error && result.added) { temporaryAddress = false; saveTemporary.hidden = true; setLabel('addresses', '地址：已保存到地址库'); await refresh('addresses'); }
+  };
+  for (const element of [line1, city, state, zip, country]) element.addEventListener('input', () => { selectedAddressResourceId = ''; if (!temporaryAddress) setLabel('addresses', '地址：手动输入'); });
+  sess.addEventListener('input', () => {
+    selectedAccountResourceId = '';
+    setLabel('accounts', '账号：手动输入');
+    accountDetectResult.className = '';
+    accountDetectResult.textContent = '内容已变化，请重新检测并入库';
+  });
+  for (const element of [num, exp, cvc, cardNameInput]) element.addEventListener('input', () => { selectedCardResourceId = ''; setLabel('cards', '卡：手动输入'); });
+
+  async function prepareSinglePaymentResources({
+    forceCard = false,
+    forceAddress = false,
+    attemptedCardIds = new Set(),
+    attemptedAddressIds = new Set()
+  } = {}) {
+    const [accounts, cards, addresses] = await Promise.all([
+      refresh('accounts'),
+      refresh('cards'),
+      refresh('addresses')
+    ]);
+    if (!sess.value.trim()) {
+      const account = accounts.find(item => !item.payment && item.accountStatus?.state === 'free' && item.usage?.state !== 'in_use');
+      if (!account) {
+        if (accounts.some(item => item.accountStatus?.state === 'pending')) throw new Error('账号状态仍在检测中，请稍后重试');
+        throw new Error('账号库中没有“无套餐”的可用账号');
+      }
+      await useResource('accounts', account);
+    }
+    const hasCompleteCard = [num.value, exp.value, cvc.value].every(value => value.trim());
+    if (forceCard || !hasCompleteCard) {
+      const unavailable = new Set(['in_use', 'cooldown', 'insufficient_funds']);
+      const card = cards
+        .filter(item => !attemptedCardIds.has(item.id) && !unavailable.has(item.usage?.state))
+        .sort((a, b) => (a.usage?.paidAccountCount || 0) - (b.usage?.paidAccountCount || 0) || a.importedAt.localeCompare(b.importedAt))[0];
+      if (!card) throw new Error(forceCard ? '没有其他可用支付卡，已停止重试' : '卡库中没有可用支付卡');
+      await useResource('cards', card);
+    }
+    if (forceAddress) {
+      const address = addresses.find(item => (
+        !attemptedAddressIds.has(item.id)
+        && item.usage?.state !== 'in_use'
+      ));
+      if (address) await useResource('addresses', address);
+      else await ensureTaskAddress(true);
+    } else {
+      await ensureTaskAddress();
+    }
+    const sessionJson = sess.value.trim();
+    if (!sessionJson) throw new Error('未能准备账号信息');
+    return sessionJson;
+  }
+
+  pay.onclick = async () => {
+    const attemptedCardIds = new Set();
+    const attemptedAddressIds = new Set();
+    let retries = 0;
+    const submitWithFallback = async ({ forceCard = false, forceAddress = false } = {}) => {
+      try {
+        if (retries > 20) throw new Error('安全重试次数已达上限，已停止');
+        const value = await prepareSinglePaymentResources({
+          forceCard,
+          forceAddress,
+          attemptedCardIds,
+          attemptedAddressIds
+        });
+        if (selectedCardResourceId) attemptedCardIds.add(selectedCardResourceId);
+        if (selectedAddressResourceId) attemptedAddressIds.add(selectedAddressResourceId);
+        const payload = { sessionJson: value, accountResourceId: selectedAccountResourceId, cardResourceId: selectedCardResourceId, addressResourceId: selectedAddressResourceId, card: { number: num.value, exp: exp.value, cvc: cvc.value, name: cardNameInput.value }, address: { line1: line1.value, city: city.value, state: state.value, zip: zip.value, country: country.value }, plan: plan.value };
+        await submitPaymentTask(payload, {
+          onFailureAction: async action => {
+            retries++;
+            if (action === 'next_card') {
+              log.textContent += '\n卡片已明确失败，正在按顺序切换下一张可用卡…';
+              await submitWithFallback({ forceCard: true });
+            } else if (action === 'next_address') {
+              log.textContent += '\n地址未通过校验，正在按顺序切换地址…';
+              await submitWithFallback({ forceAddress: true });
+            } else if (action === 'next_proxy') {
+              log.textContent += '\n代理在确认前失效，正在按顺序切换代理…';
+              await submitWithFallback();
+            }
+          }
+        });
+      } catch (error) {
+        log.textContent = `支付资源准备失败：${error.message}`;
+        setPaymentButtonsDisabled(false);
+      }
+    };
+    await submitWithFallback();
+  };
+  refreshAll();
+})();
+</script></body></html>

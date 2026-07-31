@@ -1,0 +1,16 @@
+node_modules/
+accounts/
+cards/
+addresses/
+payment-tasks/
+out/
+output/
+tmp/
+.omc/
+.superpowers/
+
+config/*.json
+payload_*.txt
+.env
+.env.*
+*.log

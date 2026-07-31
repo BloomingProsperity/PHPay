@@ -1,0 +1,17 @@
+{
+  "name": "dipay",
+  "version": "1.0.0",
+  "description": "ChatGPT PH 区订阅协议化支付/链接生成服务",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "test:resources": "node --test test/resource-importers.test.mjs test/resource-store.test.mjs",
+    "test:resource-ui": "node test/resource-ui.mjs"
+  },
+  "dependencies": {
+    "undici": "^8.9.0",
+    "playwright-core": "^1.62.0"
+  }
+}

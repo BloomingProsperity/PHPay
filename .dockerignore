@@ -1,0 +1,8 @@
+node_modules
+accounts/*.json
+cards/*.json
+addresses/*.json
+out
+config/card.json
+.git
+config/solver.json

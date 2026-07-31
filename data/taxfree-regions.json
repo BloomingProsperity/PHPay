@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "states": ["AK", "DE", "MT", "NH", "OR"]
+  },
+  "streets": {
+    "prefixes": ["N", "S", "E", "W", "NE", "NW", "SE", "SW", ""],
+    "names": [
+      "Main", "Oak", "Maple", "Cedar", "Pine", "Elm", "Washington", "Lincoln",
+      "Park", "Lake", "Hill", "River", "Market", "Church", "School", "Spring",
+      "Walnut", "Chestnut", "Birch", "Willow", "Sunset", "Highland", "Valley",
+      "Forest", "Meadow", "Garden", "Center", "Union", "State", "College",
+      "Franklin", "Jefferson", "Madison", "Jackson", "Adams", "Monroe",
+      "Broadway", "Front", "Water", "Mill", "Bridge", "Depot", "Railroad",
+      "Liberty", "Prospect", "Pleasant", "Summit", "Ridge", "Creek", "Bay"
+    ],
+    "suffixes": ["St", "Ave", "Rd", "Dr", "Blvd", "Ln", "Ct", "Way", "Pl", "Ter"]
+  },
+  "firstNames": {
+    "male": [
+      "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph",
+      "Thomas", "Christopher", "Daniel", "Matthew", "Anthony", "Mark", "Steven",
+      "Andrew", "Joshua", "Kevin", "Brian", "Ryan", "Eric", "Jason", "Justin", "Brandon"
+    ],
+    "female": [
+      "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica",
+      "Sarah", "Karen", "Nancy", "Lisa", "Betty", "Margaret", "Sandra", "Ashley",
+      "Emily", "Donna", "Michelle", "Dorothy", "Carol", "Amanda", "Melissa", "Deborah"
+    ]
+  },
+  "lastNames": [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+    "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
+    "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
+    "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
+    "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores"
+  ],
+  "states": {
+    "AK": {
+      "name": "Alaska",
+      "nameZh": "阿拉斯加州",
+      "abbr": "AK",
+      "recommended": false,
+      "note": "无州销售税；部分地方可能有地方税",
+      "areaCodes": ["907"],
+      "cities": [
+        { "city": "Anchorage", "zips": ["99501", "99502", "99503", "99504", "99507", "99508", "99515", "99516", "99517", "99518"] },
+        { "city": "Fairbanks", "zips": ["99701", "99709", "99712"] },
+        { "city": "Juneau", "zips": ["99801", "99802"] },
+        { "city": "Sitka", "zips": ["99835"] },
+        { "city": "Ketchikan", "zips": ["99901"] },
+        { "city": "Wasilla", "zips": ["99654", "99687"] },
+        { "city": "Kenai", "zips": ["99611"] },
+        { "city": "Kodiak", "zips": ["99615"] },
+        { "city": "Bethel", "zips": ["99559"] },
+        { "city": "Palmer", "zips": ["99645"] },
+        { "city": "Homer", "zips": ["99603"] },
+        { "city": "Soldotna", "zips": ["99669"] }
+      ]
+    },
+    "DE": {
+      "name": "Delaware",
+      "nameZh": "特拉华州",
+      "abbr": "DE",
+      "recommended": true,
+      "note": "首选：无州税、无地方销售税",
+      "areaCodes": ["302"],
+      "cities": [
+        { "city": "Wilmington", "zips": ["19801", "19802", "19803", "19804", "19805", "19806", "19807", "19808", "19809", "19810"] },
+        { "city": "Dover", "zips": ["19901", "19904"] },
+        { "city": "Newark", "zips": ["19702", "19711", "19713", "19716", "19717"] },
+        { "city": "Middletown", "zips": ["19709"] },
+        { "city": "Smyrna", "zips": ["19977"] },
+        { "city": "Milford", "zips": ["19963"] },
+        { "city": "Seaford", "zips": ["19973"] },
+        { "city": "Georgetown", "zips": ["19947"] },
+        { "city": "Elsmere", "zips": ["19805"] },
+        { "city": "New Castle", "zips": ["19720"] },
+        { "city": "Bear", "zips": ["19701"] },
+        { "city": "Hockessin", "zips": ["19707"] },
+        { "city": "Claymont", "zips": ["19703"] },
+        { "city": "Lewes", "zips": ["19958"] },
+        { "city": "Rehoboth Beach", "zips": ["19971"] },
+        { "city": "Bethany Beach", "zips": ["19930"] },
+        { "city": "Millsboro", "zips": ["19966"] },
+        { "city": "Laurel", "zips": ["19956"] },
+        { "city": "Harrington", "zips": ["19952"] },
+        { "city": "Camden", "zips": ["19934"] }
+      ]
+    },
+    "MT": {
+      "name": "Montana",
+      "nameZh": "蒙大拿州",
+      "abbr": "MT",
+      "recommended": true,
+      "note": "无州销售税；部分城市/度假区可能有地方税",
+      "areaCodes": ["406"],
+      "cities": [
+        { "city": "Billings", "zips": ["59101", "59102", "59105", "59106"] },
+        { "city": "Missoula", "zips": ["59801", "59802", "59803", "59804", "59808"] },
+        { "city": "Great Falls", "zips": ["59401", "59404", "59405"] },
+        { "city": "Bozeman", "zips": ["59715", "59718"] },
+        { "city": "Butte", "zips": ["59701"] },
+        { "city": "Helena", "zips": ["59601", "59602"] },
+        { "city": "Kalispell", "zips": ["59901"] },
+        { "city": "Havre", "zips": ["59501"] },
+        { "city": "Anaconda", "zips": ["59711"] },
+        { "city": "Miles City", "zips": ["59301"] },
+        { "city": "Livingston", "zips": ["59047"] },
+        { "city": "Whitefish", "zips": ["59937"] },
+        { "city": "Belgrade", "zips": ["59714"] },
+        { "city": "Hamilton", "zips": ["59840"] },
+        { "city": "Lewistown", "zips": ["59457"] },
+        { "city": "Glendive", "zips": ["59330"] }
+      ]
+    },
+    "NH": {
+      "name": "New Hampshire",
+      "nameZh": "新罕布什尔州",
+      "abbr": "NH",
+      "recommended": true,
+      "note": "无州/地方销售税；餐饮住宿等服务可能有税",
+      "areaCodes": ["603"],
+      "cities": [
+        { "city": "Manchester", "zips": ["03101", "03102", "03103", "03104", "03109"] },
+        { "city": "Nashua", "zips": ["03060", "03062", "03063", "03064"] },
+        { "city": "Concord", "zips": ["03301", "03303"] },
+        { "city": "Derry", "zips": ["03038"] },
+        { "city": "Dover", "zips": ["03820"] },
+        { "city": "Rochester", "zips": ["03867"] },
+        { "city": "Salem", "zips": ["03079"] },
+        { "city": "Merrimack", "zips": ["03054"] },
+        { "city": "Hudson", "zips": ["03051"] },
+        { "city": "Londonderry", "zips": ["03053"] },
+        { "city": "Keene", "zips": ["03431"] },
+        { "city": "Portsmouth", "zips": ["03801"] },
+        { "city": "Bedford", "zips": ["03110"] },
+        { "city": "Goffstown", "zips": ["03045"] },
+        { "city": "Laconia", "zips": ["03246"] },
+        { "city": "Claremont", "zips": ["03743"] },
+        { "city": "Lebanon", "zips": ["03766"] },
+        { "city": "Exeter", "zips": ["03833"] },
+        { "city": "Hampton", "zips": ["03842"] },
+        { "city": "Somersworth", "zips": ["03878"] }
+      ]
+    },
+    "OR": {
+      "name": "Oregon",
+      "nameZh": "俄勒冈州",
+      "abbr": "OR",
+      "recommended": true,
+      "note": "无州/地方销售税；数字商品通常免税",
+      "areaCodes": ["503", "541", "971"],
+      "cities": [
+        { "city": "Portland", "zips": ["97201", "97202", "97203", "97204", "97205", "97206", "97209", "97210", "97211", "97212", "97213", "97214", "97215", "97216", "97217", "97218", "97219", "97220", "97221", "97222", "97223", "97225", "97227", "97229", "97230", "97232", "97233", "97236", "97239", "97266"] },
+        { "city": "Eugene", "zips": ["97401", "97402", "97403", "97404", "97405", "97408"] },
+        { "city": "Salem", "zips": ["97301", "97302", "97304", "97305", "97306"] },
+        { "city": "Gresham", "zips": ["97030", "97080"] },
+        { "city": "Hillsboro", "zips": ["97123", "97124"] },
+        { "city": "Beaverton", "zips": ["97005", "97006", "97007", "97008"] },
+        { "city": "Bend", "zips": ["97701", "97702", "97703"] },
+        { "city": "Medford", "zips": ["97501", "97504"] },
+        { "city": "Springfield", "zips": ["97477", "97478"] },
+        { "city": "Corvallis", "zips": ["97330", "97331", "97333"] },
+        { "city": "Albany", "zips": ["97321", "97322"] },
+        { "city": "Tigard", "zips": ["97223", "97224"] },
+        { "city": "Lake Oswego", "zips": ["97034", "97035"] },
+        { "city": "Keizer", "zips": ["97303"] },
+        { "city": "Grants Pass", "zips": ["97526", "97527"] },
+        { "city": "Oregon City", "zips": ["97045"] },
+        { "city": "McMinnville", "zips": ["97128"] },
+        { "city": "Redmond", "zips": ["97756"] },
+        { "city": "Tualatin", "zips": ["97062"] },
+        { "city": "West Linn", "zips": ["97068"] },
+        { "city": "Woodburn", "zips": ["97071"] },
+        { "city": "Forest Grove", "zips": ["97116"] },
+        { "city": "Newberg", "zips": ["97132"] },
+        { "city": "Roseburg", "zips": ["97470", "97471"] },
+        { "city": "Klamath Falls", "zips": ["97601", "97603"] },
+        { "city": "Ashland", "zips": ["97520"] },
+        { "city": "Milwaukie", "zips": ["97222", "97267"] },
+        { "city": "Happy Valley", "zips": ["97086"] },
+        { "city": "Wilsonville", "zips": ["97070"] },
+        { "city": "Troutdale", "zips": ["97060"] }
+      ]
+    }
+  }
+}
