@@ -1,69 +1,97 @@
-# dipay — ChatGPT 菲律宾区订阅项目研究
+# PHPay
 
-## 功能
+PHPay 是一个本地 Docker 部署的订阅支付与资源管理工具。账号、支付卡、地址、任务记录和验证配置均保存在部署者自己的电脑上。
 
-- 协议化支付：session JSON + 卡 + 地址 → 自动完成订阅支付
-- 资源库严格文件导入：账号支持 JSON/TXT，卡和地址支持 JSON/CSV/TXT；每个文件单独解析，错误行拒绝入库且不回显敏感内容
-- 资源选择：账号、卡、地址均以脱敏列表显示，单笔任务可明确选择资源；手动填写卡/地址保留为备用折叠区
-- 临时地址：单笔操作没有地址时，页面生成一条“本次临时地址”；默认不入库，只有明确点击保存才写入地址库
-- 三库联动：资源库与单笔选择分开；批量功能仍使用其既有资源库范围
-- 生成链接：结账链接 / pay.openai.com 托管链接 / GCash 链接
-- 批量生成链接：session JSON 放入 `accounts/` 目录批量处理，结果写入 `out/`
-- 套餐：Go / Plus / Pro 5x / Pro 20x / Team
+## 一键部署
 
-## 部署
+### Windows
+
+1. 安装并启动 [Docker Desktop](https://www.docker.com/products/docker-desktop/)。
+2. 下载或克隆本项目。
+3. 双击 `start.bat`。
+4. 启动成功后会自动打开 `http://127.0.0.1:3456`。
+
+### Linux / macOS
 
 ```bash
-cd dipay
-vi config/card.json
+git clone https://github.com/BloomingProsperity/PHPay.git
+cd PHPay
+chmod +x deploy.sh
+./deploy.sh
+```
+
+也可以直接运行：
+
+```bash
 docker compose up -d --build
 ```
 
-打开 `http://127.0.0.1:3456`
+## 代理自动配对
 
-本地运行：
+部署脚本按以下顺序寻找代理：
 
-```bash
-npm install
-node src/server.js
+1. 手动传入的 `PHPAY_PROXY`
+2. 系统环境变量 `HTTPS_PROXY`
+3. 系统环境变量 `HTTP_PROXY`
+4. 系统环境变量 `ALL_PROXY`
+5. Windows 当前用户的系统代理设置
+
+代理为 `127.0.0.1`、`localhost` 或 `::1` 时，脚本会自动转换为容器可访问的 `host.docker.internal`。没有检测到代理时直接使用当前网络，不会阻止项目启动。
+
+如需手动指定：
+
+```powershell
+.\deploy.ps1 -Proxy "http://127.0.0.1:7890"
 ```
 
-## 使用
+或复制 `.env.example` 为 `.env`，填写：
 
-1. 提供账号凭证，粘贴到页面（三种格式自动识别）：
-   - **session JSON**：登录 chatgpt.com 后访问 `https://chatgpt.com/api/auth/session`，复制整段返回
-   - **accessToken**：上述 JSON 中 `accessToken` 字段的值，或 DevTools → Network 请求头 `Authorization: Bearer` 中的值
-   - **sessionToken**：DevTools → Application → Cookies → `__Secure-next-auth.session-token` 的值
-2. 「仅生成链接」：输出支付链接，发给客户自行支付
-3. 「立即支付」：用 config 中的卡完成支付
-4. 「批量生成链接」：多个 session JSON 放入 `accounts/` 后点击
-5. 「批量支付」：账号库 + 卡库 + 地址库按序号自动配对执行
+```dotenv
+PHPAY_PROXY=http://host:port
+```
 
-## API
+UI 中保存的代理池优先于自动检测到的单代理；因此部署后仍可在页面中导入和管理多条代理。
 
-| 端点 | 说明 |
-|---|---|
-| `GET /api/health` | 健康检查 |
-| `GET /api/defaults` | config 默认值 |
-| `GET /api/cards` | 卡库列表 |
-| `POST /api/resources/:kind/import` | 严格导入单个文件（`:kind` 为 `accounts`、`cards`、`addresses`；body: `{file:{name,text}}`） |
-| `POST /api/resources/:kind/use` | 读取用户明确选择的一条资源（body: `{id}`） |
-| `GET /api/addresses` | 地址库列表 |
-| `POST /api/addresses/temporary` | 生成一条不落库的单笔临时地址 |
-| `GET /api/batch-pay?plan=chatgptpro&conc=5` | 批量支付：账号×卡×地址按序配对，并发可配（SSE） |
-| `GET /api/pay?payload=<json>` | 支付（SSE） |
-| `GET /api/link?payload=<json>` | 生成链接（SSE） |
-| `GET /api/batch-links?plan=chatgptpro` | 批量生成（SSE） |
+## 常用命令
 
-payload: `{ sessionJson, card: {number,exp,cvc,name}, address: {line1,city,state,zip,country}, plan }`
+```bash
+# 查看状态
+docker compose ps
 
-## 环境变量
+# 查看日志
+docker compose logs -f
 
-| 变量 | 说明 | 默认 |
+# 停止
+docker compose down
+
+# 更新代码后重新部署
+git pull
+docker compose up -d --build
+```
+
+## 本地数据
+
+以下目录不会提交到 GitHub：
+
+- `accounts/`
+- `cards/`
+- `addresses/`
+- `payment-tasks/`
+- `config/`
+- `out/`
+
+重新构建容器不会删除这些目录。迁移电脑时，请单独备份它们。
+
+## 可选环境变量
+
+| 变量 | 作用 | 默认值 |
 |---|---|---|
-| `PORT` | 端口 | 3456 |
-| `HTTPS_PROXY` | 全局出口代理（Stripe 请求；chatgpt 请求在 `CF_PROXY` 未配时也走这里） | 无（直连） |
-| `CF_PROXY` | chatgpt.com 请求专用代理（curl_cffi，优先级高于 `HTTPS_PROXY`） | 无（用 `HTTPS_PROXY`） |
-| `PROXY_POOL` | 代理池，逗号分隔多个代理；批量任务按序号分配不同出口 IP | 无（用单代理） |
-| `BROWSER_WS_ENDPOINT` | 外部 Chrome CDP 地址 | 无（用内置 Chromium） |
+| `PHPAY_PROXY` | 自动检测结果的手动覆盖；仅支持 HTTP/HTTPS | 空，直连 |
+| `PROXY_POOL` | 英文逗号分隔的代理池 | 空 |
+| `BROWSER_WS_ENDPOINT` | 外部 Chrome CDP 地址 | 空 |
 | `CHROME_PATH` | Chromium 路径 | 自动 |
+| `SOLVER_API_KEY` | 备用验证服务密钥 | 空 |
+
+## 安全说明
+
+仓库不会包含本地账号、支付卡、地址、代理密码、验证密钥或历史支付任务。请勿手动把上述运行目录加入 Git。

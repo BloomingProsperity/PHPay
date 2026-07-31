@@ -2,23 +2,26 @@ services:
   dipay:
     build:
       context: .
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
       args:
-        HTTP_PROXY: http://192.168.65.254:10808
-        HTTPS_PROXY: http://192.168.65.254:10808
+        HTTP_PROXY: ${PHPAY_PROXY:-}
+        HTTPS_PROXY: ${PHPAY_PROXY:-}
     container_name: dipay
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "127.0.0.1:3456:3456"
     environment:
-      - PORT=3456
-      - HOST=0.0.0.0
-      - CF_PROXY=http://192.168.65.254:10808
-      - HTTPS_PROXY=http://192.168.65.254:10808
-      # 代理池：逗号分隔多个代理，批量任务按序号分配不同出口 IP（不设置则用上面单代理）
-      - PROXY_POOL=
-      # 挑战过盾（默认零配置：自动用内置 Chromium）
-      - BROWSER_WS_ENDPOINT=
-      - CHROME_PATH=
-      - SOLVER_API_KEY=
+      PORT: 3456
+      HOST: 0.0.0.0
+      HTTP_PROXY: ${PHPAY_PROXY:-}
+      HTTPS_PROXY: ${PHPAY_PROXY:-}
+      CF_PROXY: ${PHPAY_PROXY:-}
+      PROXY_POOL: ${PROXY_POOL:-}
+      BROWSER_WS_ENDPOINT: ${BROWSER_WS_ENDPOINT:-}
+      CHROME_PATH: ${CHROME_PATH:-}
+      SOLVER_API_KEY: ${SOLVER_API_KEY:-}
     volumes:
       - ./config:/app/config
       - ./accounts:/app/accounts
